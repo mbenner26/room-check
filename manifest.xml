@@ -75,8 +75,8 @@
         <bt:Image id="Icon.80x80" DefaultValue="https://mbenner26.github.io/room-check/assets/icon-80x80.png"/>
       </bt:Images>
       <bt:Urls>
-        <bt:Url id="Commands.Url" DefaultValue="https://mbenner26.github.io/room-check/commands.html"/>
-        <bt:Url id="Taskpane.Url" DefaultValue="https://mbenner26.github.io/room-check/taskpane.html"/>
+        <bt:Url id="Commands.Url" DefaultValue="https://mbenner26.github.io/room-check/commands/commands.html"/>
+        <bt:Url id="Taskpane.Url" DefaultValue="https://mbenner26.github.io/room-check/taskpane/taskpane.html"/>
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="GroupLabel" DefaultValue="Raum-Check"/>
