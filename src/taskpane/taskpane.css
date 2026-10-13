@@ -78,3 +78,33 @@
 b {
     font-weight: bold;
 }
+
+.ms-welcome__main {
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.form-group select {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+}
+
+#run {
+    margin-top: 20px;
+    cursor: pointer;
+    text-align: center;
+}
