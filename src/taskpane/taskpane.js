@@ -1,28 +1,64 @@
-/*
- * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
- * See LICENSE in the project root for license information.
- */
-
-/* global document, Office */
+/* global Office */
 
 Office.onReady((info) => {
   if (info.host === Office.HostType.Outlook) {
-    document.getElementById("sideload-msg").style.display = "none";
-    document.getElementById("app-body").style.display = "flex";
-    document.getElementById("run").onclick = run;
+    // Initialisierung
+    document.getElementById("run").onclick = saveRequirements;
+    setupConditionalLogic();
   }
 });
 
-export async function run() {
-  /**
-   * Insert your Outlook code here
-   */
+/**
+ * Steuert die Sichtbarkeit der Felder basierend auf den Antworten
+ */
+function setupConditionalLogic() {
+  const externalGuestsSelect = document.getElementById("externalGuests");
+  const guestDeviceContainer = document.getElementById("guestDeviceContainer");
 
-  const item = Office.context.mailbox.item;
-  let insertAt = document.getElementById("item-subject");
-  let label = document.createElement("b").appendChild(document.createTextNode("Subject: "));
-  insertAt.appendChild(label);
-  insertAt.appendChild(document.createElement("br"));
-  insertAt.appendChild(document.createTextNode(item.subject));
-  insertAt.appendChild(document.createElement("br"));
+  externalGuestsSelect.addEventListener("change", () => {
+    if (externalGuestsSelect.value === "yes") {
+      guestDeviceContainer.style.display = "block";
+    } else {
+      guestDeviceContainer.style.display = "none";
+      // Wert zurücksetzen, wenn ausgeblendet
+      document.getElementById("guestDevice").value = "";
+    }
+  });
+}
+
+/**
+ * Sammelt die Daten aus dem Formular und bereitet sie vor
+ */
+async function saveRequirements(event) {
+  event.preventDefault(); // Verhindert das Neuladen der Seite
+
+  // 1. Daten aus dem Formular sammeln
+  const formData = {
+    presentation: document.getElementById("presentation").value,
+    externalGuests: document.getElementById("externalGuests").value,
+    guestDevice: document.getElementById("guestDevice").value,
+    meetingType: document.getElementById("meetingType").value,
+    timestamp: new Date().toISOString()
+  };
+
+  // Validierung: Prüfen ob Pflichtfelder ausgefüllt sind
+  if (!formData.presentation || !formData.externalGuests || !formData.meetingType) {
+    Office.context.ui. આજ.showNotification("Bitte alle Pflichtfelder ausfüllen!");
+    return;
+  }
+
+  // Falls externe Gäste "Ja" sind, muss das Gerät gewählt sein
+  if (formData.externalGuests === "yes" && !formData.guestDevice) {
+    alert("Bitte wählen Sie das Gerät der externen Gäste aus.");
+    return;
+  }
+
+  console.log("Gesammelte Daten:", formData);
+
+  // 2. Hier findet später der API-Call statt (Phase 2)
+  // Wir simulieren hier erst einmal eine erfolgreiche Speicherung
+  alert("Daten wurden lokal erfasst! (Vorbereitung für Web-API)");
+
+  // TODO: API Call an Azure Function / Web-Service
+  // await postDataToBackend(formData);
 }
