@@ -23,7 +23,7 @@
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
-        <SourceLocation DefaultValue="hhttps://mbenner26.github.io/room-check/src/taskpane/taskpane.html"/>
+        <SourceLocation DefaultValue="https://mbenner26.github.io/room-check/src/taskpane/taskpane.html"/>
         <RequestedHeight>250</RequestedHeight>
       </DesktopSettings>
     </Form>
