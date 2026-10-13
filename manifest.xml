@@ -10,7 +10,7 @@
   <HighResolutionIconUrl DefaultValue="https://mbenner26.github.io/room-check/assets/icon-128.png"/>
   <SupportUrl DefaultValue="https://www.contoso.com/help"/>
   <AppDomains>
-    <AppDomain>https://mbenner26.github.io</AppDomain>
+    <AppDomain>https://mbenner26.github.io/room-check/taskpane</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Calendar"/>
@@ -23,7 +23,7 @@
   <FormSettings>
     <Form xsi:type="Appointment">
       <DesktopSettings>
-        <SourceLocation DefaultValue="https://mbenner26.github.io/room-check/taskpane.html"/>
+        <SourceLocation DefaultValue="https://mbenner26.github.io/room-check/taskpane/taskpane.html"/>
         <RequestedHeight>300</RequestedHeight>
       </DesktopSettings>
     </Form>
