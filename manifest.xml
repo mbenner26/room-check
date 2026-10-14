@@ -2,15 +2,15 @@
 <OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0" xsi:type="MailApp">
   <Id>94fae3bd-feab-4ae4-990a-972249f307f8</Id>
   <Version>1.0.0.1</Version>
-  <ProviderName>Contoso</ProviderName>
-  <DefaultLocale>en-US</DefaultLocale>
-  <DisplayName DefaultValue="Outlook_Test_XML"/>
+  <ProviderName>DCAB</ProviderName>
+  <DefaultLocale>de-DE</DefaultLocale>
+  <DisplayName DefaultValue="Raumbuchung"/>
   <Description DefaultValue="A template to get started."/>
   <IconUrl DefaultValue="https://mbenner26.github.io/room-check/assets/icon-64.png"/>
   <HighResolutionIconUrl DefaultValue="https://mbenner26.github.io/room-check/assets/icon-128.png"/>
-  <SupportUrl DefaultValue="https://www.contoso.com/help"/>
+  <SupportUrl DefaultValue="https://mbenner26.github.io"/>
   <AppDomains>
-    <AppDomain>https://www.contoso.com</AppDomain>
+    <AppDomain>https://mbenner26.github.io</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Mailbox"/>
@@ -102,18 +102,18 @@
         <bt:Urls>
           <bt:Url
               id="residFunctionFile"
-              DefaultValue="https://mbenner26.github.io/room-check/commands/commands.html"/>
+              DefaultValue="https://mbenner26.github.io/room-check/src/commands/commands.html"/>
           <bt:Url
               id="residTaskpaneUrl"
               DefaultValue="https://mbenner26.github.io/room-check/src/taskpane/taskpane.html"/>
           <!-- HTML-Einstiegspunkt für die Event-Runtime -->
           <bt:Url
               id="residEventHtml"
-              DefaultValue="https://mbenner26.github.io/room-check/commands/event.html"/>
+              DefaultValue="https://mbenner26.github.io/room-check/src/commands/event.html"/>
           <!-- JavaScript für die Event-Runtime -->
           <bt:Url
               id="residEventJs"
-              DefaultValue="https://mbenner26.github.io/room-check/commands/event.js"/>
+              DefaultValue="https://mbenner26.github.io/room-check/src/commands/event.js"/>
         </bt:Urls>
         <bt:ShortStrings>
           <bt:String id="residDescription" DefaultValue="Contoso meeting"/>
