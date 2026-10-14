@@ -43,7 +43,7 @@ async function saveRequirements(event) {
 
   // Validierung: Prüfen ob Pflichtfelder ausgefüllt sind
   if (!formData.presentation || !formData.externalGuests || !formData.meetingType) {
-    Office.context.ui. આજ.showNotification("Bitte alle Pflichtfelder ausfüllen!");
+    alert("Bitte alle Pflichtfelder ausfüllen!");
     return;
   }
 
