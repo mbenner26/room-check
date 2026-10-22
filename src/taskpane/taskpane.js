@@ -78,4 +78,3 @@ async function saveRequirements(event) {
 
   // TODO: API Call an Azure Function / Web-Service
   // await postDataToBackend(formData);
-}
