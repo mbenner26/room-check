@@ -12,11 +12,17 @@ Office.onReady((info) => {
  * Steuert die Sichtbarkeit der Felder basierend auf den Antworten
  */
 function setupConditionalLogic() {
-  // Vorhandene Logik für externe Gäste...
   const externalGuestsSelect = document.getElementById("externalGuests");
   const guestDeviceContainer = document.getElementById("guestDeviceContainer");
+
   externalGuestsSelect.addEventListener("change", () => {
-    guestDeviceContainer.style.display = (externalGuestsSelect.value === "yes") ? "block" : "none";
+    if (externalGuestsSelect.value === "yes") {
+      guestDeviceContainer.style.display = "block";
+    } else {
+      guestDeviceContainer.style.display = "none";
+      // Wert zurücksetzen, wenn ausgeblendet
+      document.getElementById("guestDevice").value = "";
+    }
   });
 
   // NEU: Logik für Bewirtung
