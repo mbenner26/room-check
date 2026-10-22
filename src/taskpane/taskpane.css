@@ -108,3 +108,26 @@ b {
     cursor: pointer;
     text-align: center;
 }
+
+.checkbox-inline {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.checkbox-inline input {
+    margin-right: 10px;
+    width: 18px;
+    height: 18px;
+}
+
+.checkbox-label {
+    cursor: pointer;
+}
+
+.catering-options {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
