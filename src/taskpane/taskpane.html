@@ -62,13 +62,34 @@
 
             <!-- Bewirtung -->
             <div class="form-group">
-                <label for="meetingType">Bewirtung</label>
-                <select id="meetingType" required>
-                    <input type="checkbox">fruchtig</input>
-                    <input type="checkbox">süß</input>
-                    <input type="checkbox">herzhaft</input>
-                    <input type="checkbox">keine</input>
-                </select>
+                <label>Bewirtung gewünscht?</label>
+                <div class="checkbox-inline">
+                    <input type="checkbox" id="cateringRequested"> 
+                    <span class="checkbox-label">Ja, Bewirtung bestellen</span>
+                </div>
+            </div>
+            
+            <!-- Bedingtes Feld: Bewirtungs-Details (Standardmäßig ausgeblendet) -->
+            <div id="cateringDetailsContainer" class="form-group" style="display: none; border-left: 3px solid #0078d7; padding-left: 15px; margin-left: 5px;">
+                <label>Art der Bewirtung</label>
+                <div class="catering-options">
+                    <div class="checkbox-inline">
+                        <input type="checkbox" name="cateringType" value="fruchtig" id="cat-fruchtig">
+                        <label for="cat-fruchtig">fruchtig</label>
+                    </div>
+                    <div class="checkbox-inline">
+                        <input type="checkbox" name="cateringType" value="süß" id="cat-süß">
+                        <label for="cat-süß">süß</label>
+                    </div>
+                    <div class="checkbox-inline">
+                        <input type="checkbox" name="cateringType" value="herzhaft" id="cat-herzhaft">
+                        <label for="cat-herzhaft">herzhaft</label>
+                    </div>
+                    <div class="checkbox-inline">
+                        <input type="checkbox" name="cateringType" value="keine" id="cat-keine">
+                        <label for="cat-keine">keine</label>
+                    </div>
+                </div>
             </div>
 
             <div class="ms-welcome__action ms-Button ms-Button--hero ms-Button--primary" id="run">
