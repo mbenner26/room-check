@@ -18,7 +18,7 @@ function onNewAppointmentOrganizer(event) {
     item.notificationMessages.addAsync(
         "roomCheckNotice",
         {
-            type: Office.MailboxEnums.ItemNotificationMessageType.InformationalMessage,
+            type: Office.MailboxEnums.ItemNotificationMessageType.WarningMessage,
             message: "Bitte Meeting-Anforderungen festlegen.",
             icon: "icon-64",
             persistent: true
