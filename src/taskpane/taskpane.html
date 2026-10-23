@@ -72,25 +72,55 @@
             
             <!-- Bedingtes Feld: Bewirtungs-Details (Standardmäßig ausgeblendet) -->
             <div id="cateringDetailsContainer" class="form-group" style="display: none; border-left: 3px solid #0078d7; padding-left: 15px; margin-left: 5px;">
-                <label>Art der Bewirtung</label>
-                <div class="catering-options">
-                    <div class="checkbox-inline">
-                        <input type="checkbox" name="cateringType" value="fruchtig" id="cat-fruchtig">
-                        <label for="cat-fruchtig">fruchtig</label>
+                <form id="requirementsForm">
+                    <!-- Meeting Details (Automatisch) -->
+                    <div class="section-title">Meeting Details</div>
+                    <div class="data-grid">
+                        <div class="grid-item"><label>Datum</label><span id="auto-date" class="read-only">-</span></div>
+                        <div class="grid-item"><label>Zeit</label><span id="auto-time" class="read-only">-</span></div>
+                        <div class="grid-item"><label>Raum</label><span id="auto-room" class="read-only">-</span></div>
+                        <div class="grid-item"><label>Projekt</label><input type="text" id="project-name"></div>
+                        <div class="grid-item"><label>Gastgeber</label><span id="auto-host" class="read-only">-</span></div>
+                        <div class="grid-item"><label>Vertreter</label><input type="text" id="representative"></div>
+                        <div class="grid-item"><label>Anzahl Gäste</label><input type="number" id="guest-count"></div>
+                        <div class="grid-item"><label>Sonstiges</label><input type="text" id="other-info"></div>
                     </div>
-                    <div class="checkbox-inline">
-                        <input type="checkbox" name="cateringType" value="süß" id="cat-süß">
-                        <label for="cat-süß">süß</label>
+            
+                    <!-- Externe Gäste Status -->
+                    <div class="section-title">Externe Gäste</div>
+                    <div class="checkbox-group-row">
+                        <label><input type="checkbox" name="guestStatus" value="Gold"> Gold</label>
+                        <label><input type="checkbox" name="guestStatus" value="Silber"> Silber</label>
+                        <label><input type="checkbox" name="guestStatus" value="Bronze"> Bronze</label>
+                        <label><input type="checkbox" name="guestStatus" value="VIP"> VIP</label>
                     </div>
-                    <div class="checkbox-inline">
-                        <input type="checkbox" name="cateringType" value="herzhaft" id="cat-herzhaft">
-                        <label for="cat-herzhaft">herzhaft</label>
+            
+                    <!-- Bewirtung -->
+                    <div class="section-title">Bewirtung</div>
+                    <div class="checkbox-group-row">
+                        <label><input type="checkbox" id="cat-fruchtig" name="cateringType" value="fruchtig"> Fruchtig</label>
+                        <label><input type="checkbox" id="cat-süß" name="cateringType" value="süß"> Süß</label>
+                        <label><input type="checkbox" id="cat-herzhaft" name="cateringType" value="herzhaft"> Herzhaft</label>
                     </div>
+            
+                    <!-- Tischreservierung Kantine -->
+                    <div class="section-title">Tischreservierung Kantine</div>
                     <div class="checkbox-inline">
-                        <input type="checkbox" name="cateringType" value="keine" id="cat-keine">
-                        <label for="cat-keine">keine</label>
+                        <input type="checkbox" id="canteenRequested"> 
+                        <label for="canteenRequested">Einladungskärtchen Kantine (mit Namensnennung)</label>
                     </div>
-                </div>
+                    
+                    <div id="canteenDetailsContainer" class="data-grid" style="display: none;">
+                        <div class="grid-item"><label>Datum</label><input type="date" id="cant-date"></div>
+                        <div class="grid-item"><label>Zeit</label><input type="time" id="cant-time"></div>
+                        <div class="grid-item"><label>Anzahl Gäste</label><input type="number" id="cant-guests"></div>
+                        <div class="grid-item"><label>Allergien</label><input type="text" id="cant-allergies"></div>
+                    </div>
+            
+                    <div class="ms-welcome__action ms-Button ms-Button--hero ms-Button--primary" id="run">
+                        <span class="ms-Button-label">Angaben speichern</span>
+                    </div>
+                </form>
             </div>
 
             <div class="ms-welcome__action ms-Button ms-Button--hero ms-Button--primary" id="run">
