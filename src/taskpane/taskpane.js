@@ -1,9 +1,8 @@
 /* global Office */
-
 Office.onReady((info) => {
   if (info.host === Office.HostType.Outlook) {
     document.getElementById("run").onclick = saveRequirements;
-    
+
     // Automatische Daten laden
     loadAppointmentData();
     setupConditionalLogic();
@@ -11,99 +10,69 @@ Office.onReady((info) => {
 });
 
 /**
- * Steuert die Sichtbarkeit der Felder basierend auf den Antworten
- */
+* Steuert die Sichtbarkeit ALLER bedingten Felder
+*/
 function setupConditionalLogic() {
+  // 1. Externe Gäste / Gerät (falls noch in HTML vorhanden)
   const externalGuestsSelect = document.getElementById("externalGuests");
   const guestDeviceContainer = document.getElementById("guestDeviceContainer");
+  if (externalGuestsSelect && guestDeviceContainer) {
+    externalGuestsSelect.addEventListener("change", () => {
+      guestDeviceContainer.style.display = (externalGuestsSelect.value === "yes") ? "block" : "none";
+    });
+  }
 
-  externalGuestsSelect.addEventListener("change", () => {
-    if (externalGuestsSelect.value === "yes") {
-      guestDeviceContainer.style.display = "block";
-    } else {
-      guestDeviceContainer.style.display = "none";
-      // Wert zurücksetzen, wenn ausgeblendet
-      document.getElementById("guestDevice").value = "";
-    }
-  });
-
-  // NEU: Logik für Bewirtung
+  // 2. Kantine / Details
+  const canteenReq = document.getElementById("canteenRequested");
+  const canteenDetails = document.getElementById("canteenDetailsContainer");
+  if (canteenReq && canteenDetails) {
+    canteenReq.addEventListener("change", () => {
+      canteenDetails.style.display = canteenReq.checked ? "grid" : "none";
+    });
+  }
+  
+  // 3. Bewirtung (falls du hier eine Haupt-Checkbox hast)
   const cateringRequested = document.getElementById("cateringRequested");
   const cateringDetailsContainer = document.getElementById("cateringDetailsContainer");
-  
-  cateringRequested.addEventListener("change", () => {
-    if (cateringRequested.checked) {
-      cateringDetailsContainer.style.display = "block";
-    } else {
-      cateringDetailsContainer.style.display = "none";
-      // Optional: Alle Unter-Checkboxen zurücksetzen, wenn Haupt-Checkbox deaktiviert wird
-      document.querySelectorAll('input[name="cateringType"]').forEach(cb => cb.checked = false);
-    }
-  });
+  if (cateringRequested && cateringDetailsContainer) {
+    cateringRequested.addEventListener("change", () => {
+      cateringDetailsContainer.style.display = cateringRequested.checked ? "block" : "none";
+    });
+  }
 }
 
 async function loadAppointmentData() {
   const item = Office.context.mailbox.item;
-  
-  // In Outlook-Addins sind viele Infos direkt im 'item' Objekt verfügbar
-  // Hinweis: Je nach Outlook-Version/Plattform variiert der Zugriff
-  
-  // Datum und Zeit (Beispielhaft für den Start-Termin)
-  const start = item.appointmentStart; 
+  if (!item) return;
+
+  const start = item.appointmentStart;
   if (start) {
     const dateObj = new Date(start);
     document.getElementById("auto-date").innerText = dateObj.toLocaleDateString('de-DE');
     document.getElementById("auto-time").innerText = dateObj.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
   }
-
-  // Ort/Raum
   document.getElementById("auto-room").innerText = item.location || "Nicht angegeben";
-  
-  // Gastgeber (Organisator)
-  // In der Regel über den Organizer-Namen des Items
   document.getElementById("auto-host").innerText = item.organizer || "Unbekannt";
 }
 
-function setupConditionalLogic() {
-  const canteenReq = document.getElementById("canteenRequested");
-  const canteenDetails = document.getElementById("canteenDetailsContainer");
-  
-  canteenReq.addEventListener("change", () => {
-    canteenDetails.style.display = canteenReq.checked ? "grid" : "none";
-  });
-}
-
-
-/**
- * Sammelt die Daten aus dem Formular und bereitet sie vor
- */
 async function saveRequirements(event) {
   event.preventDefault();
 
-  // Sammle Checkboxen
-  const getCheckedValues = (name) => 
+  // Hilfsfunktion für Checkbox-Arrays (Fix: Klammer ergänzt)
+  const getCheckedValues = (name) =>
     Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(cb => cb.value);
 
-  
-  // Sammle alle aktivierten Bewirtungs-Optionen in einem Array
-  const selectedCatering = Array.from(document.querySelectorAll('input[name="cateringType"]:checked'))
-                                .map(cb => cb.value);
-
   const formData = {
-    // Automatische Daten
     date: document.getElementById("auto-date").innerText,
     time: document.getElementById("auto-time").innerText,
     room: document.getElementById("auto-room").innerText,
     host: document.getElementById("auto-host").innerText,
-    // Manuelle Daten
     project: document.getElementById("project-name").value,
     representative: document.getElementById("representative").value,
     guestCount: document.getElementById("guest-count").value,
     other: document.getElementById("other-info").value,
-    // Status & Bewirtung
     guestStatus: getCheckedValues("guestStatus"),
     catering: getCheckedValues("cateringType"),
-    // Kantine
     canteen: {
       requested: document.getElementById("canteenRequested").checked,
       date: document.getElementById("cant-date").value,
@@ -113,21 +82,17 @@ async function saveRequirements(event) {
     }
   };
 
-  // Validierung
-  if (!formData.presentation || !formData.externalGuests || !formData.meetingType) {
-    alert("Bitte alle Pflichtfelder ausfüllen!");
+  // Validierung angepasst an neue Feldnamen
+  if (!formData.project || !formData.guestCount) {
+    alert("Bitte füllen Sie mindestens das Projekt und die Gästeanzahl aus!");
     return;
   }
 
-  // Validierung Bewirtung: Wenn "Ja", muss mindestens eine Option gewählt sein
-  if (formData.cateringRequested && selectedCatering.length === 0) {
-    alert("Bitte wählen Sie mindestens eine Art der Bewirtung aus.");
-    return;
+  // Validierung Bewirtung: Wenn Catering gewählt wurde, muss mind. eine Sorte angehakt sein
+  if (formData.catering.length === 0 && !document.getElementById("cateringRequested")?.checked) {
+    // Hier Logik anpassen: Ist Bewirtung Pflicht oder optional?
   }
 
   console.log("Gesammelte Daten:", formData);
   alert("Daten wurden lokal erfasst!");
 }
-
-  // TODO: API Call an Azure Function / Web-Service
-  // await postDataToBackend(formData);
