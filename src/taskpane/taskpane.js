@@ -13,7 +13,7 @@ Office.onReady((info) => {
 * Steuert die Sichtbarkeit ALLER bedingten Felder
 */
 function setupConditionalLogic() {
-  // 1. Externe Gäste / Gerät (falls noch in HTML vorhanden)
+  // 1. Externe Gäste / Gerät
   const externalGuestsSelect = document.getElementById("externalGuests");
   const guestDeviceContainer = document.getElementById("guestDeviceContainer");
   if (externalGuestsSelect && guestDeviceContainer) {
@@ -31,7 +31,7 @@ function setupConditionalLogic() {
     });
   }
   
-  // 3. Bewirtung (falls du hier eine Haupt-Checkbox hast)
+  // 3. Bewirtung
   const cateringRequested = document.getElementById("cateringRequested");
   const cateringDetailsContainer = document.getElementById("cateringDetailsContainer");
   if (cateringRequested && cateringDetailsContainer) {
@@ -45,20 +45,32 @@ async function loadAppointmentData() {
   const item = Office.context.mailbox.item;
   if (!item) return;
 
-  const start = item.appointmentStart;
-  if (start) {
-    const dateObj = new Date(start);
+  // KORREKTUR laut Dokumentation: Die Eigenschaft heißt 'start', nicht 'appointmentStart'
+  const startUtc = item.start; 
+  if (startUtc) {
+    // Konvertierung von UTC in lokale Client-Zeit (empfohlen von MS)
+    const localTime = Office.context.mailbox.convertToLocalClientTime(startUtc);
+    
+    // Da convertToLocalClientTime ein spezielles Objekt zurückgibt, 
+    // erstellen wir ein Standard-Date-Objekt für die Formatierung
+    const dateObj = new Date(startUtc); 
+    
     document.getElementById("auto-date").innerText = dateObj.toLocaleDateString('de-DE');
     document.getElementById("auto-time").innerText = dateObj.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
   }
+
+  // Ort/Raum (Eigenschaft 'location' ist korrekt)
   document.getElementById("auto-room").innerText = item.location || "Nicht angegeben";
-  document.getElementById("auto-host").innerText = item.organizer || "Unbekannt";
+
+  // Gastgeber (KORREKTUR: Eigenschaft 'from' statt 'organizer')
+  // 'from' ist ein EmailAddressDetails Objekt, daher greifen wir auf displayName zu
+  const host = item.from;
+  document.getElementById("auto-host").innerText = (host && host.displayName) ? host.displayName : "Unbekannt";
 }
 
 async function saveRequirements(event) {
   event.preventDefault();
 
-  // Hilfsfunktion für Checkbox-Arrays (Fix: Klammer ergänzt)
   const getCheckedValues = (name) =>
     Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(cb => cb.value);
 
@@ -82,15 +94,9 @@ async function saveRequirements(event) {
     }
   };
 
-  // Validierung angepasst an neue Feldnamen
   if (!formData.project || !formData.guestCount) {
     alert("Bitte füllen Sie mindestens das Projekt und die Gästeanzahl aus!");
     return;
-  }
-
-  // Validierung Bewirtung: Wenn Catering gewählt wurde, muss mind. eine Sorte angehakt sein
-  if (formData.catering.length === 0 && !document.getElementById("cateringRequested")?.checked) {
-    // Hier Logik anpassen: Ist Bewirtung Pflicht oder optional?
   }
 
   console.log("Gesammelte Daten:", formData);
