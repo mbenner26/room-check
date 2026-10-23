@@ -131,3 +131,75 @@ b {
     flex-direction: column;
     gap: 5px;
 }
+
+/* Sektions-Überschriften */
+.section-title {
+    font-weight: bold;
+    border-bottom: 2px solid #000;
+    margin: 20px 0 10px 0;
+    padding-bottom: 2px;
+    text-transform: uppercase;
+    font-size: 13px;
+}
+
+/* Grid-Layout für die Tabellen-Optik */
+.data-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Zwei Spalten */
+    gap: 0;
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+}
+
+.grid-item {
+    display: flex;
+    flex-direction: column;
+    border: 0.5px solid #ccc;
+    padding: 5px;
+}
+
+.grid-item label {
+    font-size: 11px;
+    color: #666;
+    margin-bottom: 2px;
+    font-weight: normal;
+}
+
+.grid-item input, .grid-item .read-only {
+    border: none;
+    font-size: 14px;
+    padding: 0;
+    background: transparent;
+    width: 100%;
+}
+
+.read-only {
+    color: #d00; /* Rot für automatische Daten wie im Bild */
+    font-weight: bold;
+}
+
+/* Checkbox Zeilen */
+.checkbox-group-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 15px;
+    font-size: 13px;
+}
+
+.checkbox-group-row label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.checkbox-group-row input {
+    margin-right: 5px;
+}
+
+.checkbox-inline {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    margin-bottom: 10px;
+}
