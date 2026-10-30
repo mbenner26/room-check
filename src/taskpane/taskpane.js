@@ -3,39 +3,48 @@ Office.onReady((info) => {
   if (info.host === Office.HostType.Outlook) {
     document.getElementById("run").onclick = saveRequirements;
     
-    // 1. Zuerst die harten Fakten aus dem Outlook-Termin laden
+    // Daten laden
     loadAppointmentData();
-
-    // 2. Dann versuchen, eventuelle alte (gespeicherte) Informationen zu laden
     loadSavedProperties();
-
+    
+    // Alle Logik-Schalter aktivieren
     setupConditionalLogic();
   }
 });
 
 /**
-* Lädt die harten Fakt-Daten aus dem Outlook-Element
-* (Datum, Zeit, Raum, Gastgeber)
-*/
+ * Holt Daten aus dem Outlook-Termin. 
+ * Nutzt .value statt .innerText, da wir jetzt Inputs verwenden.
+ */
 async function loadAppointmentData() {
   const item = Office.context.mailbox.item;
   if (!item) return;
 
-  const start = item.start;
-  if (start) {
-    const dateObj = new Date(start);
-    document.getElementById("auto-date").innerText = dateObj.toLocaleDateString('de-DE');
-    document.getElementById("auto-time").innerText = dateObj.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-  }
+  try {
+    // Startzeit
+    const start = item.start;
+    if (start && start instanceof Date && !isNaN(start)) {
+      const dateObj = new Date(start);
+      document.getElementById("auto-date").value = dateObj.toLocaleDateString('de-DE');
+      document.getElementById("auto-time").value = dateObj.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+    } else {
+      // Fallback falls start kein gültiges Date Objekt ist
+      document.getElementById("auto-date").value = "";
+      document.getElementById("auto-time").value = "";
+    }
 
-  document.getElementById("auto-room").innerText = item.location || "Nicht angegeben";
-  const host = item.from;
-  document.getElementById("auto-host").innerText = (host && host.displayName) ? host.displayName : "Unbekannt";
+    // Ort/Raum - Sicherstellen, dass es ein String ist
+    document.getElementById("auto-room").value = (typeof item.location === 'string') ? item.location : "Nicht angegeben";
+
+    // Gastgeber
+    const host = item.from;
+    document.getElementById("auto-host").value = (host && host.displayName) ? host.displayName : "Unbekannt";
+    
+  } catch (e) {
+    console.error("Fehler beim Laden der Termindaten:", e);
+  }
 }
 
-/**
-* Lädt benutzerdefinierte Daten aus den CustomProperties
-*/
 async function loadSavedProperties() {
   const item = Office.context.mailbox.item;
   item.loadCustomPropertiesAsync((result) => {
@@ -46,8 +55,7 @@ async function loadSavedProperties() {
       if (savedData) {
         try {
           const data = JSON.parse(savedData);
-          console.log("Geladene Daten aus Speicher:", data);
-
+          // Manuelle Felder befüllen
           document.getElementById("project-name").value = data.project || "";
           document.getElementById("representative").value = data.representative || "";
           document.getElementById("guest-count").value = data.guestCount || "";
@@ -66,30 +74,60 @@ async function loadSavedProperties() {
           if (data.canteen) {
             document.getElementById("canteenRequested").checked = data.canteen.requested;
             document.getElementById("cant-date").value = data.canteen.date || "";
-            document.getElementById("cant-time").value = data.canteen.time || ""; // FIX: Tippfehler korrigiert
+            document.getElementById("cant-time").value = data.canteen.time || "";
             document.getElementById("cant-guests").value = data.canteen.guests || "";
             document.getElementById("cant-allergies").value = data.canteen.allergies || "";
-
             if (data.canteen.requested) {
               document.getElementById("canteenDetailsContainer").style.display = "grid";
             }
           }
-        } catch (e) {
-          console.error("Fehler beim Parsen der gespeicherten Daten:", e);
-        }
+        } catch (e) { console.error("Parse Error:", e); }
       }
     }
   });
 }
 
+function setupConditionalLogic() {
+  // 1. EXTERNE GÄSTE Logik (Hier lag der Fehler im Bild)
+  const externalGuestsSelect = document.getElementById("externalGuests");
+  const guestDeviceContainer = document.getElementById("guestDeviceContainer");
+  if (externalGuestsSelect && guestDeviceContainer) {
+    externalGuestsSelect.addEventListener("change", () => {
+      guestDeviceContainer.style.display = (externalGuestsSelect.value === "yes" || externalGuestsSelect.value === "Ja") ? "block" : "none";
+    });
+  }
+
+  // 2. KANTINE Logik
+  const canteenReq = document.getElementById("canteenRequested");
+  const canteenDetails = document.getElementById("canteenDetailsContainer");
+  if (canteenReq && canteenDetails) {
+    canteenReq.addEventListener("change", () => {
+      canteenDetails.style.display = canteenReq.checked ? "grid" : "none";
+    });
+  }
+
+  // 3. BEWIRTUNG Logik
+  const cateringRequested = document.getElementById("cateringRequested");
+  const cateringDetailsContainer = document.getElementById("cateringDetailsContainer");
+  if (cateringRequested && cateringDetailsContainer) {
+    cateringRequested.addEventListener("change", () => {
+      cateringDetailsContainer.style.display = cateringRequested.checked ? "block" : "none";
+    });
+  }
+}
+
 async function saveRequirements(event) {
   event.preventDefault();
-
-  // FIX: Klammer bei querySelectorAll ergänzt
   const getCheckedValues = (name) =>
     Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(cb => cb.value);
 
   const formData = {
+    // Wir speichern jetzt auch die bearbeiteten Meeting-Details, 
+    // falls der Nutzer sie manuell geändert hat!
+    date: document.getElementById("auto-date").value,
+    time: document.getElementById("auto-time").value,
+    room: document.getElementById("auto-room").value,
+    host: document.getElementById("auto-host").value,
     project: document.getElementById("project-name").value,
     representative: document.getElementById("representative").value,
     guestCount: document.getElementById("guest-count").value,
@@ -115,34 +153,11 @@ async function saveRequirements(event) {
     if (loadResult.status === Office.AsyncResultStatus.Succeeded) {
       const props = loadResult.value;
       props.set("savedRequirements", JSON.stringify(formData));
-
       props.saveAsync((saveResult) => {
         if (saveResult.status === Office.AsyncResultStatus.Succeeded) {
-          alert("Erfolg: Die Angaben wurden im Termin gespeichert!");
-        } else {
-          alert("Fehler beim Speichern der Daten.");
+          alert("Erfolg: Alle Angaben wurden im Termin gespeichert!");
         }
       });
     }
   });
-}
-
-function setupConditionalLogic() {
-  // Kantine Logik
-  const canteenReq = document.getElementById("canteenRequested");
-  const canteenDetails = document.getElementById("canteenDetailsContainer");
-  if (canteenReq && canteenDetails) {
-    canteenReq.addEventListener("change", () => {
-      canteenDetails.style.display = canteenReq.checked ? "grid" : "none";
-    });
-  }
-  
-  // Bewirtung Haupt-Checkbox Logik (falls vorhanden)
-  const cateringRequested = document.getElementById("cateringRequested");
-  const cateringDetailsContainer = document.getElementById("cateringDetailsContainer");
-  if (cateringRequested && cateringDetailsContainer) {
-    cateringRequested.addEventListener("change", () => {
-      cateringDetailsContainer.style.display = cateringRequested.checked ? "block" : "none";
-    });
-  }
 }
