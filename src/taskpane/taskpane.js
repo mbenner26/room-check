@@ -74,7 +74,7 @@ async function loadSavedProperties() {
         if (data.canteen) {
           document.getElementById("canteenRequested").checked = data.canteen.requested;
           document.getElementById("cant-date").value = data.canteen.date || "";
-          document.getElementById("cant-time").value = data.c�anteen.time || "";
+          document.getElementById("cant-time").value = data.canteen.time || "";
           document.getElementById("cant-guests").value = data.canteen.guests || "";
           document.getElementById("cant-allergies").value = data.canteen.allergies || "";
           
