@@ -205,8 +205,12 @@ b {
 }
 
 .required-field {
-    border: 2px solid #d13438 !important;
-    background-color: #fff4f4;
+    border: 1px solid #c8c6c4;
+}
+
+.required-field.error {
+    border: 2px solid #d13438;
+    background: #fff4f4;
 }
 
 .required-label {
