@@ -3,14 +3,14 @@ Office.onReady((info) => {
     if (info.host !== Office.HostType.Outlook) {
         return;
     }
+
     document
         .getElementById("run")
         .addEventListener("click", saveRequirements);
-    ensureItemIsSaved()
-        .then(() => {
-            loadAppointmentData();
-            loadSavedProperties();
-        });
+
+    loadAppointmentData();
+    loadSavedProperties();
+
     setupConditionalLogic();
 });
 
@@ -132,76 +132,190 @@ async function loadSavedProperties() {
   });
 }
 
-async function saveRequirements(event) {
+async function saveRequirements() {
+
+    console.log("Speichern gestartet");
+
     if (!Office.context.mailbox.item) {
-    
-        console.error(
-            "Kein Outlook-Element verfügbar"
-        );
-    
+
+        console.error("Kein Outlook Item vorhanden");
+
         return;
     }
-  event.preventDefault();
-  const getCheckedValues = (name) =>
-    Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(cb => cb.value);
 
-  const formData = {
-    presentation: document.getElementById("presentation").value,
-    externalGuests: document.getElementById("externalGuests").value,
-    guestDevice: document.getElementById("guestDevice").value,
-    meetingType: document.getElementById("meetingType").value,
-    cateringRequested: document.getElementById("cateringRequested").checked,
-    date: document.getElementById("auto-date").value,
-    time: document.getElementById("auto-time").value,
-    room: document.getElementById("auto-room").value,
-    host: document.getElementById("auto-host").value,
-    project: document.getElementById("project-name").value,
-    representative: document.getElementById("representative").value,
-    guestCount: document.getElementById("guest-count").value,
-    other: document.getElementById("other-info").value,
-    guestStatus: getCheckedValues("guestStatus"),
-    catering: getCheckedValues("cateringType"),
-    canteen: {
-      requested: document.getElementById("canteenRequested").checked,
-      date: document.getElementById("cant-date").value,
-      time: document.getElementById("cant-time").value,
-      guests: document.getElementById("cant-guests").value,
-      allergies: document.getElementById("cant-allergies").value
-    }
-  };
+    await ensureItemIsSaved();
 
-  if (!formData.project || !formData.guestCount) {
-    alert("Bitte füllen Sie mindestens das Projekt und die Gästeanzahl aus!");
-    return;
-  }
+    const getCheckedValues = (name) =>
+        Array.from(
+            document.querySelectorAll(
+                `input[name="${name}"]:checked`
+            )
+        ).map(cb => cb.value);
 
-  const item = Office.context.mailbox.item;
-  item.loadCustomPropertiesAsync((loadResult) => {
-    if (loadResult.status === Office.AsyncResultStatus.Succeeded) {
-      const props = loadResult.value;
-      props.set("savedRequirements", JSON.stringify(formData));
-      props.saveAsync((saveResult) => {
-        if (saveResult.status === Office.AsyncResultStatus.Succeeded) {
-          Office.context.mailbox.item.notificationMessages.replaceAsync(
-              "saved",
-              {
-                  type:
-                  Office.MailboxEnums.ItemNotificationMessageType
-                      .InformationalMessage,
-                  message: "Angaben erfolgreich gespeichert.",
-                  icon: "icon-64",
-                  persistent: false
-              }
-          );
-        } else {
-          console.error(
-              "Fehler beim Speichern:",
-              saveResult.error.message
-          );
+    const formData = {
+
+        presentation:
+            document.getElementById("presentation").value,
+
+        externalGuests:
+            document.getElementById("externalGuests").value,
+
+        guestDevice:
+            document.getElementById("guestDevice").value,
+
+        meetingType:
+            document.getElementById("meetingType").value,
+
+        cateringRequested:
+            document.getElementById("cateringRequested").checked,
+
+        date:
+            document.getElementById("auto-date").value,
+
+        time:
+            document.getElementById("auto-time").value,
+
+        room:
+            document.getElementById("auto-room").value,
+
+        host:
+            document.getElementById("auto-host").value,
+
+        project:
+            document.getElementById("project-name").value,
+
+        representative:
+            document.getElementById("representative").value,
+
+        guestCount:
+            document.getElementById("guest-count").value,
+
+        other:
+            document.getElementById("other-info").value,
+
+        guestStatus:
+            getCheckedValues("guestStatus"),
+
+        catering:
+            getCheckedValues("cateringType"),
+
+        canteen: {
+            requested:
+                document.getElementById("canteenRequested").checked,
+
+            date:
+                document.getElementById("cant-date").value,
+
+            time:
+                document.getElementById("cant-time").value,
+
+            guests:
+                document.getElementById("cant-guests").value,
+
+            allergies:
+                document.getElementById("cant-allergies").value
         }
-      });
+    };
+
+    const missingFields = [];
+
+    if (!formData.presentation)
+        missingFields.push("Präsentation");
+
+    if (!formData.externalGuests)
+        missingFields.push("Externe Gäste");
+
+    if (!formData.meetingType)
+        missingFields.push("Videokonferenz");
+
+    if (!formData.project)
+        missingFields.push("Projekt");
+
+    if (!formData.guestCount)
+        missingFields.push("Anzahl Gäste");
+
+    if (missingFields.length > 0) {
+
+        Office.context.mailbox.item.notificationMessages.replaceAsync(
+            "validation",
+            {
+                type:
+                    Office.MailboxEnums
+                        .ItemNotificationMessageType
+                        .ErrorMessage,
+
+                message:
+                    "Pflichtfelder fehlen: "
+                    + missingFields.join(", ")
+            }
+        );
+
+        return;
     }
-  });
+
+    console.log(formData);
+
+    const item = Office.context.mailbox.item;
+
+    item.loadCustomPropertiesAsync((loadResult) => {
+
+        if (
+            loadResult.status !==
+            Office.AsyncResultStatus.Succeeded
+        ) {
+
+            console.error(loadResult.error);
+
+            return;
+        }
+
+        const props = loadResult.value;
+
+        props.set(
+            "savedRequirements",
+            JSON.stringify(formData)
+        );
+
+        props.saveAsync((saveResult) => {
+
+            if (
+                saveResult.status ===
+                Office.AsyncResultStatus.Succeeded
+            ) {
+
+                console.log(
+                    "CustomProperties gespeichert"
+                );
+
+                updateAppointmentBody(formData);
+
+                Office.context.mailbox.item
+                    .notificationMessages
+                    .replaceAsync(
+                        "saved",
+                        {
+                            type:
+                                Office.MailboxEnums
+                                    .ItemNotificationMessageType
+                                    .InformationalMessage,
+
+                            message:
+                                "Raumbuchung erfolgreich gespeichert.",
+
+                            persistent: false
+                        }
+                    );
+
+            } else {
+
+                console.error(
+                    "Speicherfehler:",
+                    saveResult.error
+                );
+
+            }
+        });
+    });
 }
 
 function setupConditionalLogic() {
@@ -304,7 +418,7 @@ function updateAppointmentBody(data) {
             let body = result.value;
 
             body = body.replace(
-                /<hr><h2>Raumbuchung<\/h2>[\s\S]*?ROOMCHECK_END -->/g,
+                /<!-- ROOMCHECK_START -->[\s\S]*?<!-- ROOMCHECK_END -->/g,
                 ""
             );
 
