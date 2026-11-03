@@ -1,17 +1,19 @@
 /* global Office */
 Office.onReady((info) => {
-  if (info.host === Office.HostType.Outlook) {
-    document.getElementById("run").onclick = saveRequirements;
-    
-    // WICHTIG: Erst speichern, dann Daten laden
-    ensureItemIsSaved().then(() => {
-      loadAppointmentData();
-      loadSavedProperties();
-    });
-    
+    if (info.host !== Office.HostType.Outlook) {
+        return;
+    }
+    document
+        .getElementById("run")
+        .addEventListener("click", saveRequirements);
+    ensureItemIsSaved()
+        .then(() => {
+            loadAppointmentData();
+            loadSavedProperties();
+        });
     setupConditionalLogic();
-  }
 });
+
 
 /**
  * Stellt sicher, dass der Termin im Postfach existiert (ID hat),
@@ -37,23 +39,42 @@ async function ensureItemIsSaved() {
 }
 
 async function loadAppointmentData() {
-  const item = Office.context.mailbox.item;
-  if (!item) return;
-
-  try {
-    const start = item.start;
-    if (start && start instanceof Date && !isNaN(start)) {
-      const dateObj = new Date(start);
-      document.getElementById("auto-date").value = dateObj.toLocaleDateString('de-DE');
-      document.getElementById("auto-time").value = dateObj.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+    const item = Office.context.mailbox.item;
+    if (!item) {
+        return;
     }
-
-    document.getElementById("auto-room").value = (typeof item.location === 'string') ? item.location : "Nicht angegeben";
-    const host = Office.context.mailbox.userProfile.displayName;
-    document.getElementById("auto-host").value = (host && host.displayName) ? host.displayName : "Unbekannt";
-  } catch (e) {
-    console.error("Fehler beim Laden der Termindaten:", e);
-  }
+    try {
+        if (item.start instanceof Date) {
+            const dateObj = new Date(item.start);
+            document.getElementById("auto-date").value =
+                dateObj.toLocaleDateString("de-DE");
+            document.getElementById("auto-time").value =
+                dateObj.toLocaleTimeString("de-DE", {
+                    hour: "2-digit",
+                    minute: "2-digit"
+                });
+        }
+        document.getElementById("auto-host").value =
+            Office.context.mailbox.userProfile.displayName || "";
+        if (item.location && typeof item.location.getAsync === "function") {
+            item.location.getAsync((result) => {
+                if (
+                    result.status === Office.AsyncResultStatus.Succeeded
+                ) {
+                    document.getElementById("auto-room").value =
+                        result.value || "";
+                }
+            });
+        } else if (typeof item.location === "string") {
+            document.getElementById("auto-room").value =
+                item.location || "";
+        }
+    } catch (err) {
+        console.error(
+            "Fehler beim Laden der Kalenderdaten",
+            err
+        );
+    }
 }
 
 async function loadSavedProperties() {
@@ -133,9 +154,22 @@ async function saveRequirements(event) {
       props.set("savedRequirements", JSON.stringify(formData));
       props.saveAsync((saveResult) => {
         if (saveResult.status === Office.AsyncResultStatus.Succeeded) {
-          alert("Erfolg: Die Angaben wurden im Termin gespeichert!");
+          Office.context.mailbox.item.notificationMessages.replaceAsync(
+              "saved",
+              {
+                  type:
+                  Office.MailboxEnums.ItemNotificationMessageType
+                      .InformationalMessage,
+                  message: "Angaben erfolgreich gespeichert.",
+                  icon: "icon-64",
+                  persistent: false
+              }
+          );
         } else {
-          alert("Fehler beim Speichern: " + saveResult.error.message);
+          console.error(
+              "Fehler beim Speichern:",
+              saveResult.error.message
+          );
         }
       });
     }
