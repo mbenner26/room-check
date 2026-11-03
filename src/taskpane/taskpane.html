@@ -25,7 +25,7 @@
                     <option value="">Bitte auswählen...</option>
                     <option value="analog">Analog</option>
                     <option value="digital">Digital</option>
-                    <option value="digital">keine</option>
+                    <option value="none">keine</option>
                 </select>
             </div>
 
@@ -72,7 +72,6 @@
             
             <!-- Bedingtes Feld: Bewirtungs-Details (Standardmäßig ausgeblendet) -->
             <div id="cateringDetailsContainer" class="form-group" style="display: none; border-left: 3px solid #0078d7; padding-left: 15px; margin-left: 5px;">
-                <form id="requirementsForm">
                     <!-- Meeting Details (Automatisch) -->
                     <div class="section-title">MEETING DETAILS</div>
                     <div class="data-grid">
@@ -116,7 +115,6 @@
                         <div class="grid-item"><label>Anzahl Gäste</label><input type="number" id="cant-guests"></div>
                         <div class="grid-item"><label>Allergien</label><input type="text" id="cant-allergies"></div>
                     </div>
-                </form>
             </div>
 
             <div class="ms-welcome__action ms-Button ms-Button--hero ms-Button--primary" id="run">
