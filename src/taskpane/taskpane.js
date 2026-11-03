@@ -180,7 +180,6 @@ async function saveRequirements(event) {
     if (loadResult.status === Office.AsyncResultStatus.Succeeded) {
       const props = loadResult.value;
       props.set("savedRequirements", JSON.stringify(formData));
-      updateAppointmentBody(formData);
       props.saveAsync((saveResult) => {
         if (saveResult.status === Office.AsyncResultStatus.Succeeded) {
           Office.context.mailbox.item.notificationMessages.replaceAsync(
@@ -309,7 +308,10 @@ function updateAppointmentBody(data) {
                 ""
             );
 
-            body += buildBookingText(data);
+            body =
+                buildBookingText(data)
+                + "<br><br>"
+                + body;
 
             item.body.setAsync(
                 body,
