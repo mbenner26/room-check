@@ -3,6 +3,20 @@
  * See LICENSE in the project root for license information.
  */
 
+@font-face {
+    font-family: 'GrotesqueDCA-R'; /* Ein einheitlicher Name */
+    src: url('https://mbenner26.github.io/room-check/assets/fonts/GrotesqueDCA-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'GrotesqueDCA-M';
+    src: url('https://mbenner26.github.io/room-check/assets/fonts/GrotesqueDCA-Medium.ttf') format('truetype');
+    font-weight: 600; /* Medium wird über das Gewicht gesteuert */
+    font-style: normal;
+}
+
  html,
  body {
      width: 100%;
