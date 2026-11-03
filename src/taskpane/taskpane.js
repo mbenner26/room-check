@@ -345,58 +345,230 @@ function setupConditionalLogic() {
 function buildBookingText(data) {
 
     const guestStatus =
-        (data.guestStatus || []).join(", ");
+        data.guestStatus?.length > 0
+            ? data.guestStatus.join(", ")
+            : "-";
 
     const catering =
-        (data.catering || []).join(", ");
+        data.catering?.length > 0
+            ? data.catering.join(", ")
+            : "-";
 
     return `
-<hr>
-
-<h2>Raumbuchung</h2>
-
-<p>
-<b>Präsentation:</b> ${data.presentation || "-"}<br>
-<b>Externe Gäste:</b> ${data.externalGuests || "-"}<br>
-<b>Gerät externe Gäste:</b> ${data.guestDevice || "-"}<br>
-<b>Videokonferenz:</b> ${data.meetingType || "-"}
-</p>
-
-<p>
-<b>Projekt:</b> ${data.project || "-"}<br>
-<b>Gastgeber:</b> ${data.host || "-"}<br>
-<b>Vertreter:</b> ${data.representative || "-"}<br>
-<b>Anzahl Gäste:</b> ${data.guestCount || "-"}
-</p>
-
-<p>
-<b>Gästestatus:</b> ${guestStatus || "-"}
-</p>
-
-<p>
-<b>Bewirtung:</b> ${catering || "-"}
-</p>
-
-<p>
-<b>Kantinenreservierung:</b>
-${data.canteen?.requested ? "Ja" : "Nein"}
-</p>
-
-<p>
-<b>Datum:</b> ${data.canteen?.date || "-"}<br>
-<b>Zeit:</b> ${data.canteen?.time || "-"}<br>
-<b>Gäste:</b> ${data.canteen?.guests || "-"}<br>
-<b>Allergien:</b> ${data.canteen?.allergies || "-"}
-</p>
-
-<p>
-<b>Sonstiges:</b><br>
-${data.other || "-"}
-</p>
 
 <!-- ROOMCHECK_START -->
-${encodeURIComponent(JSON.stringify(data))}
+
+<table
+    width="100%"
+    cellpadding="0"
+    cellspacing="0"
+    style="
+        border-collapse:collapse;
+        font-family:Segoe UI,Arial,sans-serif;
+        border:1px solid #d1d1d1;
+        margin-bottom:20px;
+    ">
+
+    <tr>
+        <td
+            colspan="2"
+            style="
+                background:#0078D4;
+                color:white;
+                padding:15px;
+                font-size:22px;
+                font-weight:bold;
+            ">
+            📅 Raumbuchung
+        </td>
+    </tr>
+
+    <tr>
+        <td
+            colspan="2"
+            style="
+                background:#f3f9fd;
+                padding:10px;
+                font-weight:bold;
+                color:#0078D4;
+                border-bottom:1px solid #d1d1d1;
+            ">
+            Meeting
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Präsentation</td>
+        <td style="padding:8px;">${data.presentation || "-"}</td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Videokonferenz</td>
+        <td style="padding:8px;">${data.meetingType || "-"}</td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Projekt</td>
+        <td style="padding:8px;">${data.project || "-"}</td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Gastgeber</td>
+        <td style="padding:8px;">${data.host || "-"}</td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Vertreter</td>
+        <td style="padding:8px;">${data.representative || "-"}</td>
+    </tr>
+
+    <tr>
+        <td
+            colspan="2"
+            style="
+                background:#f3f9fd;
+                padding:10px;
+                font-weight:bold;
+                color:#0078D4;
+                border-top:1px solid #d1d1d1;
+                border-bottom:1px solid #d1d1d1;
+            ">
+            Teilnehmer
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Externe Gäste</td>
+        <td style="padding:8px;">
+            ${data.externalGuests === "yes" ? "Ja" : "Nein"}
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Gerät</td>
+        <td style="padding:8px;">
+            ${data.guestDevice || "-"}
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Anzahl Gäste</td>
+        <td style="padding:8px;">
+            ${data.guestCount || "-"}
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Status</td>
+        <td style="padding:8px;">
+            ${guestStatus}
+        </td>
+    </tr>
+
+    <tr>
+        <td
+            colspan="2"
+            style="
+                background:#f3f9fd;
+                padding:10px;
+                font-weight:bold;
+                color:#0078D4;
+                border-top:1px solid #d1d1d1;
+                border-bottom:1px solid #d1d1d1;
+            ">
+            Bewirtung
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Bewirtung</td>
+        <td style="padding:8px;">
+            ${data.cateringRequested ? "Ja" : "Nein"}
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Art</td>
+        <td style="padding:8px;">
+            ${catering}
+        </td>
+    </tr>
+
+    <tr>
+        <td
+            colspan="2"
+            style="
+                background:#f3f9fd;
+                padding:10px;
+                font-weight:bold;
+                color:#0078D4;
+                border-top:1px solid #d1d1d1;
+                border-bottom:1px solid #d1d1d1;
+            ">
+            Kantinenreservierung
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Reservierung</td>
+        <td style="padding:8px;">
+            ${data.canteen?.requested ? "Ja" : "Nein"}
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Datum</td>
+        <td style="padding:8px;">
+            ${data.canteen?.date || "-"}
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Zeit</td>
+        <td style="padding:8px;">
+            ${data.canteen?.time || "-"}
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Gäste</td>
+        <td style="padding:8px;">
+            ${data.canteen?.guests || "-"}
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Allergien</td>
+        <td style="padding:8px;">
+            ${data.canteen?.allergies || "-"}
+        </td>
+    </tr>
+
+    <tr>
+        <td
+            colspan="2"
+            style="
+                background:#f3f9fd;
+                padding:10px;
+                font-weight:bold;
+                color:#0078D4;
+                border-top:1px solid #d1d1d1;
+                border-bottom:1px solid #d1d1d1;
+            ">
+            Sonstiges
+        </td>
+    </tr>
+
+    <tr>
+        <td colspan="2" style="padding:10px;">
+            ${data.other || "-"}
+        </td>
+    </tr>
+
+</table>
+
 <!-- ROOMCHECK_END -->
+
 `;
 }
 
