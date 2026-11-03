@@ -364,7 +364,7 @@ function buildBookingText(data) {
     cellspacing="0"
     style="
         border-collapse:collapse;
-        font-family:Segoe UI,Arial,sans-serif;
+        font-family:GrotesqueDCA-R;
         border:1px solid #d1d1d1;
         margin-bottom:20px;
     ">
