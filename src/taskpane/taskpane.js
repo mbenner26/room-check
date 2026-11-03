@@ -86,6 +86,11 @@ async function loadSavedProperties() {
       if (savedData) {
         try {
           const data = JSON.parse(savedData);
+          document.getElementById("presentation").value = data.presentation || "";
+          document.getElementById("externalGuests").value = data.externalGuests || "";
+          document.getElementById("guestDevice").value = data.guestDevice || "";
+          document.getElementById("meetingType").value = data.meetingType || "";
+          document.getElementById("cateringRequested").checked = data.cateringRequested || false;
           document.getElementById("project-name").value = data.project || "";
           document.getElementById("representative").value = data.representative || "";
           document.getElementById("guest-count").value = data.guestCount || "";
@@ -111,6 +116,16 @@ async function loadSavedProperties() {
               document.getElementById("canteenDetailsContainer").style.display = "grid";
             }
           }
+          if (data.externalGuests === "yes") {
+                document.getElementById(
+                    "guestDeviceContainer"
+                ).style.display = "block";
+            }
+            if (data.cateringRequested) {
+                document.getElementById(
+                    "cateringDetailsContainer"
+                ).style.display = "block";
+          }
         } catch (e) { console.error("Parse Error:", e); }
       }
     }
@@ -118,6 +133,14 @@ async function loadSavedProperties() {
 }
 
 async function saveRequirements(event) {
+    if (!Office.context.mailbox.item) {
+    
+        console.error(
+            "Kein Outlook-Element verfügbar"
+        );
+    
+        return;
+    }
   event.preventDefault();
   const getCheckedValues = (name) =>
     Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(cb => cb.value);
