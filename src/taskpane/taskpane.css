@@ -203,3 +203,16 @@ b {
     font-size: 13px;
     margin-bottom: 10px;
 }
+
+.required-field {
+    border: 2px solid #d13438 !important;
+    background-color: #fff4f4;
+}
+
+.required-label {
+    color: #d13438 !important;
+}
+
+.required-label::after {
+    content: " *";
+}
