@@ -123,6 +123,11 @@ async function saveRequirements(event) {
     Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(cb => cb.value);
 
   const formData = {
+    presentation: document.getElementById("presentation").value,
+    externalGuests: document.getElementById("externalGuests").value,
+    guestDevice: document.getElementById("guestDevice").value,
+    meetingType: document.getElementById("meetingType").value,
+    cateringRequested: document.getElementById("cateringRequested").checked,
     date: document.getElementById("auto-date").value,
     time: document.getElementById("auto-time").value,
     room: document.getElementById("auto-room").value,
