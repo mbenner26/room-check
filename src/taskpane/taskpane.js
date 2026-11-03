@@ -49,7 +49,7 @@ async function loadAppointmentData() {
     }
 
     document.getElementById("auto-room").value = (typeof item.location === 'string') ? item.location : "Nicht angegeben";
-    const host = item.from;
+    const host = Office.context.mailbox.userProfile.displayName;
     document.getElementById("auto-host").value = (host && host.displayName) ? host.displayName : "Unbekannt";
   } catch (e) {
     console.error("Fehler beim Laden der Termindaten:", e);
