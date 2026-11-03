@@ -379,7 +379,7 @@ function buildBookingText(data) {
                 font-size:22px;
                 font-weight:bold;
             ">
-            📅 Raumbuchung
+            Raumbuchung
         </td>
     </tr>
 
