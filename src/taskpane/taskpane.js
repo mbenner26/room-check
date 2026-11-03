@@ -180,6 +180,7 @@ async function saveRequirements(event) {
     if (loadResult.status === Office.AsyncResultStatus.Succeeded) {
       const props = loadResult.value;
       props.set("savedRequirements", JSON.stringify(formData));
+      updateAppointmentBody(formData);
       props.saveAsync((saveResult) => {
         if (saveResult.status === Office.AsyncResultStatus.Succeeded) {
           Office.context.mailbox.item.notificationMessages.replaceAsync(
@@ -226,4 +227,97 @@ function setupConditionalLogic() {
       cateringDetailsContainer.style.display = cateringRequested.checked ? "block" : "none";
     });
   }
+}
+
+function buildBookingText(data) {
+
+    const guestStatus =
+        (data.guestStatus || []).join(", ");
+
+    const catering =
+        (data.catering || []).join(", ");
+
+    return `
+<hr>
+
+<h2>Raumbuchung</h2>
+
+<p>
+<b>Präsentation:</b> ${data.presentation || "-"}<br>
+<b>Externe Gäste:</b> ${data.externalGuests || "-"}<br>
+<b>Gerät externe Gäste:</b> ${data.guestDevice || "-"}<br>
+<b>Videokonferenz:</b> ${data.meetingType || "-"}
+</p>
+
+<p>
+<b>Projekt:</b> ${data.project || "-"}<br>
+<b>Gastgeber:</b> ${data.host || "-"}<br>
+<b>Vertreter:</b> ${data.representative || "-"}<br>
+<b>Anzahl Gäste:</b> ${data.guestCount || "-"}
+</p>
+
+<p>
+<b>Gästestatus:</b> ${guestStatus || "-"}
+</p>
+
+<p>
+<b>Bewirtung:</b> ${catering || "-"}
+</p>
+
+<p>
+<b>Kantinenreservierung:</b>
+${data.canteen?.requested ? "Ja" : "Nein"}
+</p>
+
+<p>
+<b>Datum:</b> ${data.canteen?.date || "-"}<br>
+<b>Zeit:</b> ${data.canteen?.time || "-"}<br>
+<b>Gäste:</b> ${data.canteen?.guests || "-"}<br>
+<b>Allergien:</b> ${data.canteen?.allergies || "-"}
+</p>
+
+<p>
+<b>Sonstiges:</b><br>
+${data.other || "-"}
+</p>
+
+<!-- ROOMCHECK_START -->
+${encodeURIComponent(JSON.stringify(data))}
+<!-- ROOMCHECK_END -->
+`;
+}
+
+function updateAppointmentBody(data) {
+
+    const item = Office.context.mailbox.item;
+
+    item.body.getAsync(
+        Office.CoercionType.Html,
+        (result) => {
+
+            if (
+                result.status !==
+                Office.AsyncResultStatus.Succeeded
+            ) {
+                return;
+            }
+
+            let body = result.value;
+
+            body = body.replace(
+                /<hr><h2>Raumbuchung<\/h2>[\s\S]*?ROOMCHECK_END -->/g,
+                ""
+            );
+
+            body += buildBookingText(data);
+
+            item.body.setAsync(
+                body,
+                {
+                    coercionType:
+                        Office.CoercionType.Html
+                }
+            );
+        }
+    );
 }
