@@ -104,9 +104,20 @@ b {
 }
 
 #run {
-    margin-top: 20px;
-    cursor: pointer;
+    width: 100%;
+    margin-top: 25px;
+    background: #0078d4;
+    color: white;
+    padding: 14px;
+    border-radius: 6px;
     text-align: center;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s;
+}
+
+#run:hover {
+    background: #106ebe;
 }
 
 .checkbox-inline {
@@ -220,3 +231,19 @@ b {
 .required-label::after {
     content: " *";
 }
+
+#requirementsForm {
+    width: 100%;
+    max-width: 800px;
+}
+
+.card-section {
+    background: white;
+    border: 1px solid #edebe9;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow:
+        0 1px 2px rgba(0,0,0,.08);
+}
+
