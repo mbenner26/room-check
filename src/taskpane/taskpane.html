@@ -15,7 +15,31 @@
         <img width="90" height="90" src="https://mbenner26.github.io/room-check/assets/logo-filled.png" alt="Logo" title="Contoso" />
         <h1 class="ms-font-su">Raumbuchung</h1>
     </header>
-
+    <div class="card-section">
+        <label class="required-label">
+            Support benötigt?
+        </label>
+        <div class="radio-group">
+            <label>
+                <input
+                    type="radio"
+                    name="supportRequired"
+                    value="yes">
+                Ja
+            </label>
+            <label>
+                <input
+                    type="radio"
+                    name="supportRequired"
+                    value="no">
+                Nein
+            </label>
+        </div>
+    </div>
+    <div
+        id="supportContainer"
+        class="card-section"
+        style="display:none;">
     <main id="app-body" class="ms-welcome__main">
         <form id="requirementsForm">
             <!-- Präsentation -->
