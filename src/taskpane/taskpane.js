@@ -10,8 +10,6 @@ Office.onReady((info) => {
 
         loadAppointmentData();
         loadSavedProperties();
-        loadAttendees();
-        addServiceAttendees();
         setupConditionalLogic();
 
         const addGuestBtn =
@@ -134,10 +132,32 @@ async function loadSavedProperties() {
               document.querySelector(
                   'input[name="cateringDecision"][value="yes"]'
               ).checked = true;
-          } else {
+              document.getElementById(
+                  "cateringDetailsContainer"
+              ).style.display = "block";
+            } else {
               document.querySelector(
                   'input[name="cateringDecision"][value="no"]'
               ).checked = true;
+              document.getElementById(
+                  "cateringDetailsContainer"
+              ).style.display = "none";
+          }
+
+          if (data.supportRequired === "yes") {
+              document.querySelector(
+                  'input[name="supportRequired"][value="yes"]'
+              ).checked = true;
+              document.getElementById(
+                  "supportContainer"
+              ).style.display = "block";
+          } else {
+              document.querySelector(
+                  'input[name="supportRequired"][value="no"]'
+              ).checked = true;
+              document.getElementById(
+                  "supportContainer"
+              ).style.display = "none";
           }
           document.getElementById("project-name").value = data.project || "";
           document.getElementById("representative").value = data.representative || "";
@@ -168,6 +188,51 @@ async function loadSavedProperties() {
                 document.getElementById(
                     "cateringDetailsContainer"
                 ).style.display = "block";
+          }
+          if (
+              data.guests &&
+              data.guests.length
+          ) {
+
+              const body =
+                  document.getElementById(
+                      "guestTableBody"
+                  );
+
+              body.innerHTML = "";
+
+              data.guests.forEach(
+                  guest => {
+
+                      const row =
+                          document.createElement(
+                              "tr"
+                          );
+
+                      row.innerHTML = `
+
+          <td>
+          <input
+          value="${guest.name || ""}">
+          </td>
+
+          <td>
+          <input
+          value="${guest.company || ""}">
+          </td>
+
+          <td>
+          <input
+          value="${guest.role || ""}">
+          </td>
+
+          `;
+
+                      body.appendChild(row);
+
+                  }
+              );
+
           }
         } catch (e) { console.error("Parse Error:", e); }
       }
@@ -323,13 +388,14 @@ async function saveRequirements() {
 
                 guests.push({
 
-                    name: inputs[0].value,
+                  name:
+                    inputs[0]?.value || "",
 
-                    company:
-                        inputs[1].value,
+                  company:
+                    inputs[1]?.value || "",
 
-                    role:
-                        inputs[2].value
+                  role:
+                    inputs[2]?.value || ""
 
                 });
 
@@ -377,13 +443,13 @@ async function saveRequirements() {
 
             });
 
-    const formData = {
+const formData = {
 
-        formData.changes = {};
+        changes: {},
 
         supportRequired:
             document.querySelector(
-                'input[name="supportRequired"]:checked'
+                  'input[name="supportRequired"]:checked'
             )?.value || "no",
 
         cateringDecision:
@@ -453,40 +519,37 @@ async function saveRequirements() {
         }
     };
 
-[
-    "presentation",
-    "externalGuests",
-    "guestDevice",
-    "meetingType",
-    "project",
-    "representative",
-    "guestCount",
-    "other"
-]
+    [
+        "presentation",
+        "externalGuests",
+        "guestDevice",
+        "meetingType",
+        "project",
+        "representative",
+        "guestCount",
+        "other"
+    ]
+    .forEach(field => {
 
-.forEach(field => {
+        if (
+            previousData[field] !== undefined
+            &&
+            previousData[field] !== formData[field]
+        ) {
 
-    if (
-        previousData[field]
-        &&
-        previousData[field]
-            !==
-        formData[field]
-    ) {
+            formData.changes[field] = {
 
-        formData.changes[field] = {
+                old:
+                    previousData[field],
 
-            old:
-                previousData[field],
+                new:
+                    formData[field]
 
-            new:
-                formData[field]
+            };
 
-        };
+        }
 
-    }
-
-});
+    });
 
     const supportDecision =
         document.querySelector(
@@ -587,8 +650,6 @@ async function saveRequirements() {
 
     console.log(formData);
 
-    const item = Office.context.mailbox.item;
-
     item.loadCustomPropertiesAsync((loadResult) => {
 
         if (
@@ -611,6 +672,8 @@ async function saveRequirements() {
             "savedRequirements",
             JSON.stringify(formData)
         );
+
+        addServiceAttendees();
 
         props.saveAsync((saveResult) => {
 
@@ -757,30 +820,6 @@ function setupConditionalLogic() {
     }
 }
 
-function loadAttendees() {
-
-    const item =
-        Office.context.mailbox.item;
-
-    item.requiredAttendees.getAsync(
-        (result) => {
-
-            if (
-                result.status !==
-                Office.AsyncResultStatus.Succeeded
-            ) {
-                return;
-            }
-
-            const attendees =
-                result.value
-                    .map(
-                        a => a.displayName
-                    );
-        }
-    );
-}
-
 function displayValue(
     field,
     data
@@ -795,23 +834,44 @@ function displayValue(
     ) {
 
         return `
-<span
+
+<div
 style="
 background:#fff4ce;
-color:#d13438;
-font-weight:bold;
-padding:2px 6px;
-border-radius:3px;
+padding:6px;
+border-left:4px solid #d13438;
 ">
 
-${value}
+<div
+style="
+font-size:11px;
+color:#666;
+">
 
-</span>
+Vorher:
+${data.changes[field].old}
+
+</div>
+
+<div
+style="
+font-weight:bold;
+color:#d13438;
+">
+
+Neu:
+${data.changes[field].new}
+
+</div>
+
+</div>
+
 `;
 
     }
 
     return value;
+
 }
 
 function buildBookingText(data) {
@@ -840,94 +900,61 @@ function buildBookingText(data) {
 
       .join("");
 
-    if (
-        data.supportRequired === "no"
-        &&
-        data.cateringDecision === "no"
-    ) {
-
-      const guestRows =
-
-          (
-              data.guests || []
-          )
-
-          .map(
-              guest => `
-
-      <tr>
-
-          <td>
-              ${guest.name || "-"}
-          </td>
-
-          <td>
-              ${guest.company || "-"}
-          </td>
-
-          <td>
-              ${guest.role || "-"}
-          </td>
-
-      </tr>
-
-      `
-          )
-
-          .join("");
-
-        return `
-    <div id="roomcheck-block">
-
-    <table
-        width="100%"
-        cellpadding="0"
-        cellspacing="0"
-        style="
-            border-collapse:collapse;
-            font-family:'Segoe UI', Arial, sans-serif;
-            border:1px solid #d1d1d1;
-        ">
-
-        <tr>
-            <td
-                style="
-                    background:#0078D4;
-                    color:white;
-                    padding:15px;
-                    font-size:20px;
-                    font-weight:bold;
-                ">
-                Raumbuchung
-            </td>
-        </tr>
-
-        <tr>
-            <td
-                style="
-                    padding:15px;
-                    background:#f8f8f8;
-                ">
-                Kein Support und keine Bewirtung gewünscht.
-            </td>
-        </tr>
-
-    </table>
-
-    </div>
-    `;
-    }
 
 
-    const guestStatus =
-        data.guestStatus?.length > 0
-            ? data.guestStatus.join(", ")
-            : "-";
+  const catering =
+      data.catering?.length > 0
+          ? data.catering.join(", ")
+          : "-";
 
-    const catering =
-        data.catering?.length > 0
-            ? data.catering.join(", ")
-            : "-";
+
+        if (
+                data.supportRequired === "no"
+                &&
+                data.cateringDecision === "no"
+            ) {
+
+                return `
+                <div id="roomcheck-block">
+
+                <table
+                    width="100%"
+                    cellpadding="0"
+                    cellspacing="0"
+                    style="
+                        border-collapse:collapse;
+                        font-family:'Segoe UI', Arial, sans-serif;
+                        border:1px solid #d1d1d1;
+                    ">
+
+                    <tr>
+                        <td
+                            style="
+                                background:#0078D4;
+                                color:white;
+                                padding:15px;
+                                font-size:20px;
+                                font-weight:bold;
+                            ">
+                            Raumbuchung
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td
+                            style="
+                                padding:15px;
+                                background:#f8f8f8;
+                            ">
+                            Kein Support und keine Bewirtung gewünscht.
+                        </td>
+                    </tr>
+
+                </table>
+
+                </div>
+                `;
+            }
 
     return `
 
@@ -1075,23 +1102,6 @@ function buildBookingText(data) {
 
         </td>
 
-    </tr>
-
-            </td>
-
-            </tr>
-
-        </td>
-    </tr>
-
-    <tr>
-        <td style="padding:8px;font-weight:bold;">
-            Status
-        </td>
-
-        <td style="padding:8px;">
-            ${guestStatus}
-        </td>
     </tr>
 
     <tr>
