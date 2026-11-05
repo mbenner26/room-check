@@ -278,3 +278,13 @@ b {
 .radio-group input[type="radio"] {
     transform: scale(1.2);
 }
+
+.required-notice {
+
+    color: #d13438;
+
+    font-weight: 600;
+
+    margin-bottom: 10px;
+
+}
