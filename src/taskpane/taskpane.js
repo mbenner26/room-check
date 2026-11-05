@@ -756,23 +756,33 @@ function buildBookingText(data) {
     </tr>
 
     <tr>
-        <td style="padding:8px;font-weight:bold;">Status</td>
-        <tr>
-            <td
-                colspan="2"
-                style="
-                    padding:10px;
-                    background:#fafafa;
-                    border-top:1px solid #ddd;
-                ">
+        <td
+            colspan="2"
+            style="
+                background:#f3f9fd;
+                padding:10px;
+                font-weight:bold;
+                color:#0078D4;
+                border-top:1px solid #d1d1d1;
+                border-bottom:1px solid #d1d1d1;
+            ">
+            Teilnehmerliste
+        </td>
+    </tr>
 
-                ${(
-                    data.attendees || "-"
-                ).replace(/\n/g,"<br>")}
+    <tr>
+        <td colspan="2" style="padding:10px;">
 
-            </td>
+            ${(data.attendees || "-")
+                .replace(/\n/g,"<br>")}
 
-        </tr>
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">
+            Status
+        </td>
 
         <td style="padding:8px;">
             ${guestStatus}
@@ -909,7 +919,8 @@ function updateAppointmentBody(data) {
             );
 
             body =
-                "<p>TEST RAUMBUCHUNG</p>"
+                buildBookingText(data)
+                + "<br><br>"
                 + body;
 
             item.body.setAsync(
