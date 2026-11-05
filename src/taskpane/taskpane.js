@@ -8,15 +8,11 @@ Office.onReady((info) => {
         .getElementById("run")
         .addEventListener("click", saveRequirements);
 
-    loadAppointmentData();
-    loadSavedProperties();
-    loadAppointmentData();
-    loadSavedProperties();
-    loadAttendees();
-    addServiceAttendees();
-    setupConditionalLogic();
-
-    setupConditionalLogic();
+        loadAppointmentData();
+        loadSavedProperties();
+        loadAttendees();
+        addServiceAttendees();
+        setupConditionalLogic();
 });
 
 
@@ -120,7 +116,15 @@ async function loadSavedProperties() {
           document.getElementById("externalGuests").value = data.externalGuests || "";
           document.getElementById("guestDevice").value = data.guestDevice || "";
           document.getElementById("meetingType").value = data.meetingType || "";
-          document.getElementById("cateringRequested").checked = data.cateringRequested || false;
+          if (data.cateringRequested) {
+              document.querySelector(
+                  'input[name="cateringDecision"][value="yes"]'
+              ).checked = true;
+          } else {
+              document.querySelector(
+                  'input[name="cateringDecision"][value="no"]'
+              ).checked = true;
+          }
           document.getElementById("project-name").value = data.project || "";
           document.getElementById("representative").value = data.representative || "";
           document.getElementById("guest-count").value = data.guestCount || "";
@@ -290,7 +294,7 @@ async function saveRequirements() {
             document.getElementById("meetingType").value,
 
         cateringRequested:
-            document.getElementById("cateringRequested").checked,
+            (document.querySelector('input[name="cateringDecision"]:checked')?.value === "yes"),
 
         date:
             document.getElementById("auto-date").value,
@@ -641,14 +645,258 @@ function loadAttendees() {
 
 function buildBookingText(data) {
 
+    const guestStatus =
+        data.guestStatus?.length > 0
+            ? data.guestStatus.join(", ")
+            : "-";
+
+    const catering =
+        data.catering?.length > 0
+            ? data.catering.join(", ")
+            : "-";
+
     return `
+
 <!-- ROOMCHECK_START -->
 
-<p>
-Raumbuchung Test
-</p>
+<table
+    width="100%"
+    cellpadding="0"
+    cellspacing="0"
+    style="
+        border-collapse:collapse;
+        font-family:GrotesqueDCA-R;
+        border:1px solid #d1d1d1;
+        margin-bottom:20px;
+    ">
+
+    <tr>
+        <td
+            colspan="2"
+            style="
+                background:#0078D4;
+                color:white;
+                padding:15px;
+                font-size:22px;
+                font-weight:bold;
+            ">
+            Raumbuchung
+        </td>
+    </tr>
+
+    <tr>
+        <td
+            colspan="2"
+            style="
+                background:#f3f9fd;
+                padding:10px;
+                font-weight:bold;
+                color:#0078D4;
+                border-bottom:1px solid #d1d1d1;
+            ">
+            Meeting
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Präsentation</td>
+        <td style="padding:8px;">${data.presentation || "-"}</td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Videokonferenz</td>
+        <td style="padding:8px;">${data.meetingType || "-"}</td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Projekt</td>
+        <td style="padding:8px;">${data.project || "-"}</td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Gastgeber</td>
+        <td style="padding:8px;">${data.host || "-"}</td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Vertreter</td>
+        <td style="padding:8px;">${data.representative || "-"}</td>
+    </tr>
+
+    <tr>
+        <td
+            colspan="2"
+            style="
+                background:#f3f9fd;
+                padding:10px;
+                font-weight:bold;
+                color:#0078D4;
+                border-top:1px solid #d1d1d1;
+                border-bottom:1px solid #d1d1d1;
+            ">
+            Teilnehmer
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Externe Gäste</td>
+        <td style="padding:8px;">
+            ${data.externalGuests === "yes" ? "Ja" : "Nein"}
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Gerät</td>
+        <td style="padding:8px;">
+            ${data.guestDevice || "-"}
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Anzahl Gäste</td>
+        <td style="padding:8px;">
+            ${data.guestCount || "-"}
+        </td>
+    </tr>
+
+    <tr>
+        <td
+            colspan="2"
+            style="
+                background:#f3f9fd;
+                padding:10px;
+                font-weight:bold;
+                color:#0078D4;
+                border-top:1px solid #d1d1d1;
+                border-bottom:1px solid #d1d1d1;
+            ">
+            Teilnehmerliste
+        </td>
+    </tr>
+
+    <tr>
+        <td colspan="2" style="padding:10px;">
+
+            ${(data.attendees || "-")
+                .replace(/\n/g,"<br>")}
+
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">
+            Status
+        </td>
+
+        <td style="padding:8px;">
+            ${guestStatus}
+        </td>
+    </tr>
+
+    <tr>
+        <td
+            colspan="2"
+            style="
+                background:#f3f9fd;
+                padding:10px;
+                font-weight:bold;
+                color:#0078D4;
+                border-top:1px solid #d1d1d1;
+                border-bottom:1px solid #d1d1d1;
+            ">
+            Bewirtung
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Bewirtung</td>
+        <td style="padding:8px;">
+            ${data.cateringRequested ? "Ja" : "Nein"}
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Art</td>
+        <td style="padding:8px;">
+            ${catering}
+        </td>
+    </tr>
+
+    <tr>
+        <td
+            colspan="2"
+            style="
+                background:#f3f9fd;
+                padding:10px;
+                font-weight:bold;
+                color:#0078D4;
+                border-top:1px solid #d1d1d1;
+                border-bottom:1px solid #d1d1d1;
+            ">
+            Kantinenreservierung
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Reservierung</td>
+        <td style="padding:8px;">
+            ${data.canteen?.requested ? "Ja" : "Nein"}
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Datum</td>
+        <td style="padding:8px;">
+            ${data.canteen?.date || "-"}
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Zeit</td>
+        <td style="padding:8px;">
+            ${data.canteen?.time || "-"}
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Gäste</td>
+        <td style="padding:8px;">
+            ${data.canteen?.guests || "-"}
+        </td>
+    </tr>
+
+    <tr>
+        <td style="padding:8px;font-weight:bold;">Allergien</td>
+        <td style="padding:8px;">
+            ${data.canteen?.allergies || "-"}
+        </td>
+    </tr>
+
+    <tr>
+        <td
+            colspan="2"
+            style="
+                background:#f3f9fd;
+                padding:10px;
+                font-weight:bold;
+                color:#0078D4;
+                border-top:1px solid #d1d1d1;
+                border-bottom:1px solid #d1d1d1;
+            ">
+            Sonstiges
+        </td>
+    </tr>
+
+    <tr>
+        <td colspan="2" style="padding:10px;">
+            ${data.other || "-"}
+        </td>
+    </tr>
+
+</table>
 
 <!-- ROOMCHECK_END -->
+
 `;
 }
 
@@ -679,13 +927,33 @@ function updateAppointmentBody(data) {
                 + "<br><br>"
                 + body;
 
-            item.body.setAsync(
-                body,
-                {
-                    coercionType:
-                        Office.CoercionType.Html
-                }
-            );
+                item.body.setAsync(
+                    body,
+                    {
+                        coercionType:
+                            Office.CoercionType.Html
+                    },
+                    (result) => {
+                        console.log(
+                            "BODY UPDATE STATUS:",
+                            result.status
+                        );
+                        if (
+                            result.status !==
+                            Office.AsyncResultStatus.Succeeded
+                        ) {
+                            console.error(
+                                "BODY UPDATE ERROR:",
+                                result.error
+                            );
+                        } else {
+                            console.log(
+                                "BODY UPDATE ERFOLGREICH"
+                            );
+                        }
+
+                    }
+                );
         }
     );
 }
