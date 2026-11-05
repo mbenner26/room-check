@@ -10,6 +10,11 @@ Office.onReady((info) => {
 
     loadAppointmentData();
     loadSavedProperties();
+    loadAppointmentData();
+    loadSavedProperties();
+    loadAttendees();
+    addServiceAttendees();
+    setupConditionalLogic();
 
     setupConditionalLogic();
 });
@@ -44,15 +49,40 @@ async function loadAppointmentData() {
         return;
     }
     try {
-        if (item.start instanceof Date) {
-            const dateObj = new Date(item.start);
-            document.getElementById("auto-date").value =
-                dateObj.toLocaleDateString("de-DE");
-            document.getElementById("auto-time").value =
-                dateObj.toLocaleTimeString("de-DE", {
-                    hour: "2-digit",
-                    minute: "2-digit"
-                });
+      if (
+          item.start &&
+          typeof item.start.getAsync === "function"
+        ) {
+
+          item.start.getAsync((result) => {
+
+              if (
+                  result.status ===
+                  Office.AsyncResultStatus.Succeeded
+              ) {
+
+                  const dateObj =
+                      new Date(result.value);
+
+                  document.getElementById(
+                      "auto-date"
+                  ).value =
+                      dateObj.toLocaleDateString(
+                          "de-DE"
+                      );
+
+                  document.getElementById(
+                      "auto-time"
+                  ).value =
+                      dateObj.toLocaleTimeString(
+                          "de-DE",
+                          {
+                              hour: "2-digit",
+                              minute: "2-digit"
+                          }
+                      );
+              }
+          });
         }
         document.getElementById("auto-host").value =
             Office.context.mailbox.userProfile.displayName || "";
@@ -95,6 +125,7 @@ async function loadSavedProperties() {
           document.getElementById("representative").value = data.representative || "";
           document.getElementById("guest-count").value = data.guestCount || "";
           document.getElementById("other-info").value = data.other || "";
+          document.getElementById("attendee-list").value = data.attendees || "";
 
           if (data.guestStatus) {
             document.querySelectorAll('input[name="guestStatus"]').forEach(cb => {
@@ -130,6 +161,71 @@ async function loadSavedProperties() {
       }
     }
   });
+}
+
+function addServiceAttendees() {
+
+    const item = Office.context.mailbox.item;
+
+    if (
+        !item ||
+        !item.optionalAttendees ||
+        !item.optionalAttendees.addAsync
+    ) {
+        return;
+    }
+
+    item.optionalAttendees.getAsync((result) => {
+
+        if (
+            result.status !==
+            Office.AsyncResultStatus.Succeeded
+        ) {
+            return;
+        }
+
+        const existing =
+            result.value.map(
+                x => x.emailAddress.toLowerCase()
+            );
+
+        const toAdd = [];
+
+        if (
+            !existing.includes(
+                "email1@domain.de"
+            )
+        ) {
+            toAdd.push({
+                displayName:
+                    "Raumbuchung",
+                emailAddress:
+                    "email1@domain.de"
+            });
+        }
+
+        if (
+            !existing.includes(
+                "email2@domain.de"
+            )
+        ) {
+            toAdd.push({
+                displayName:
+                    "Raumbuchung",
+                emailAddress:
+                    "email2@domain.de"
+            });
+        }
+
+        if (toAdd.length > 0) {
+
+            item.optionalAttendees.addAsync(
+                toAdd
+            );
+
+        }
+
+    });
 }
 
 function showError(text) {
@@ -170,6 +266,16 @@ async function saveRequirements() {
         ).map(cb => cb.value);
 
     const formData = {
+
+        supportRequired:
+            document.querySelector(
+                'input[name="supportRequired"]:checked'
+            )?.value || "no",
+
+        cateringDecision:
+            document.querySelector(
+                'input[name="cateringDecision"]:checked'
+            )?.value || "no",
 
         presentation:
             document.getElementById("presentation").value,
@@ -215,6 +321,9 @@ async function saveRequirements() {
 
         catering:
             getCheckedValues("cateringType"),
+
+        attendees:
+            document.getElementById("attendee-list").value,
 
         canteen: {
             requested:
@@ -365,7 +474,13 @@ async function saveRequirements() {
                     "CustomProperties gespeichert"
                 );
 
-                updateAppointmentBody(formData);
+                setTimeout(() => {
+
+                    updateAppointmentBody(
+                        formData
+                    );
+
+                }, 500);
 
                 Office.context.mailbox.item
                     .notificationMessages
@@ -493,6 +608,37 @@ function setupConditionalLogic() {
     }
 }
 
+function loadAttendees() {
+
+    const item =
+        Office.context.mailbox.item;
+
+    item.requiredAttendees.getAsync(
+        (result) => {
+
+            if (
+                result.status !==
+                Office.AsyncResultStatus.Succeeded
+            ) {
+                return;
+            }
+
+            const attendees =
+                result.value
+                    .map(
+                        a => a.displayName
+                    );
+
+            document
+                .getElementById(
+                    "attendee-list"
+                )
+                .value =
+                    attendees.join("\n");
+        }
+    );
+}
+
 function buildBookingText(data) {
 
     const guestStatus =
@@ -611,6 +757,23 @@ function buildBookingText(data) {
 
     <tr>
         <td style="padding:8px;font-weight:bold;">Status</td>
+        <tr>
+            <td
+                colspan="2"
+                style="
+                    padding:10px;
+                    background:#fafafa;
+                    border-top:1px solid #ddd;
+                ">
+
+                ${(
+                    data.attendees || "-"
+                ).replace(/\n/g,"<br>")}
+
+            </td>
+
+        </tr>
+
         <td style="padding:8px;">
             ${guestStatus}
         </td>
