@@ -909,8 +909,7 @@ function updateAppointmentBody(data) {
             );
 
             body =
-                buildBookingText(data)
-                + "<br><br>"
+                "<p>TEST RAUMBUCHUNG</p>"
                 + body;
 
             item.body.setAsync(
