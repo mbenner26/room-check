@@ -335,8 +335,51 @@ async function saveRequirements() {
 
             });
 
+            let previousData = {};
+
+            const item =
+                Office.context.mailbox.item;
+
+            await new Promise((resolve) => {
+
+                item.loadCustomPropertiesAsync(
+                    (result) => {
+
+                        if (
+                            result.status ===
+                            Office.AsyncResultStatus.Succeeded
+                        ) {
+
+                            const saved =
+                                result.value.get(
+                                    "savedRequirements"
+                                );
+
+                            if (saved) {
+
+                                try {
+
+                                    previousData =
+                                        JSON.parse(
+                                            saved
+                                        );
+
+                                } catch {}
+
+                            }
+
+                        }
+
+                        resolve();
+
+                    }
+                );
+
+            });
 
     const formData = {
+
+        formData.changes = {};
 
         supportRequired:
             document.querySelector(
@@ -409,6 +452,41 @@ async function saveRequirements() {
                 document.getElementById("cant-allergies").value
         }
     };
+
+[
+    "presentation",
+    "externalGuests",
+    "guestDevice",
+    "meetingType",
+    "project",
+    "representative",
+    "guestCount",
+    "other"
+]
+
+.forEach(field => {
+
+    if (
+        previousData[field]
+        &&
+        previousData[field]
+            !==
+        formData[field]
+    ) {
+
+        formData.changes[field] = {
+
+            old:
+                previousData[field],
+
+            new:
+                formData[field]
+
+        };
+
+    }
+
+});
 
     const supportDecision =
         document.querySelector(
@@ -703,6 +781,39 @@ function loadAttendees() {
     );
 }
 
+function displayValue(
+    field,
+    data
+) {
+
+    const value =
+        data[field] || "-";
+
+    if (
+        data.changes &&
+        data.changes[field]
+    ) {
+
+        return `
+<span
+style="
+background:#fff4ce;
+color:#d13438;
+font-weight:bold;
+padding:2px 6px;
+border-radius:3px;
+">
+
+${value}
+
+</span>
+`;
+
+    }
+
+    return value;
+}
+
 function buildBookingText(data) {
 
   const guestRows =
@@ -863,17 +974,17 @@ function buildBookingText(data) {
 
     <tr>
         <td style="padding:8px;font-weight:bold;">Präsentation</td>
-        <td style="padding:8px;">${data.presentation || "-"}</td>
+        <td style="padding:8px;">${displayValue("presentation",data)}</td>
     </tr>
 
     <tr>
         <td style="padding:8px;font-weight:bold;">Videokonferenz</td>
-        <td style="padding:8px;">${data.meetingType || "-"}</td>
+        <td style="padding:8px;">${displayValue("meetingType",data)}</td>
     </tr>
 
     <tr>
         <td style="padding:8px;font-weight:bold;">Projekt</td>
-        <td style="padding:8px;">${data.project || "-"}</td>
+        <td style="padding:8px;">${displayValue("project",data)}</td>
     </tr>
 
     <tr>
@@ -883,7 +994,7 @@ function buildBookingText(data) {
 
     <tr>
         <td style="padding:8px;font-weight:bold;">Vertreter</td>
-        <td style="padding:8px;">${data.representative || "-"}</td>
+        <td style="padding:8px;">${displayValue("representative",data)}</td>
     </tr>
 
     <tr>
@@ -911,14 +1022,14 @@ function buildBookingText(data) {
     <tr>
         <td style="padding:8px;font-weight:bold;">Gerät</td>
         <td style="padding:8px;">
-            ${data.guestDevice || "-"}
+            ${displayValue("guestDevice",data)}
         </td>
     </tr>
 
     <tr>
         <td style="padding:8px;font-weight:bold;">Anzahl Gäste</td>
         <td style="padding:8px;">
-            ${data.guestCount || "-"}
+            ${displayValue("guestCount",data)}
         </td>
     </tr>
 
@@ -1079,7 +1190,7 @@ function buildBookingText(data) {
 
     <tr>
         <td colspan="2" style="padding:10px;">
-            ${data.other || "-"}
+            ${displayValue("other",data)}
         </td>
     </tr>
 
