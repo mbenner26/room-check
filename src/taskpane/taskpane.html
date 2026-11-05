@@ -82,8 +82,11 @@
                     </select>
                 </div>
             </div>
-            
+
             <!-- Bewirtung -->
+            <div class="required-notice">
+                * Pflichtangaben für die Bewirtung
+            </div>
             <div class="card-section">
                 <label class="required-label">
                     Bewirtung benötigt?
@@ -110,14 +113,22 @@
             <div id="cateringDetailsContainer" class="form-group" style="display: none; border-left: 3px solid #0078d7; padding-left: 15px; margin-left: 5px;">
                     <!-- Meeting Details (Automatisch) -->
                     <div class="section-title">MEETING DETAILS</div>
+                    <div class="required-notice">
+
+                        Für die Bewirtung sind
+                        Datum, Zeit, Raum,
+                        Gastgeber, Projekt und
+                        Anzahl Gäste erforderlich.
+
+                    </div>
                     <div class="data-grid">
-                        <div class="grid-item"><label>Datum</label><input type="text" id="auto-date"></div>
-                        <div class="grid-item"><label>Zeit</label><input type="text" id="auto-time"></div>
-                        <div class="grid-item"><label>Raum</label><input type="text" id="auto-room"></div>
-                        <div class="grid-item"><label>Projekt</label><input type="text" id="project-name" class="required-field"></div>
-                        <div class="grid-item"><label>Gastgeber</label><input type="text" id="auto-host"></div>
+                        <div class="grid-item"><label class="required-label">Datum</label><input type="text" id="auto-date"></div>
+                        <div class="grid-item"><label class="required-label">Zeit</label><input type="text" id="auto-time"></div>
+                        <div class="grid-item"><label class="required-label">Raum</label><input type="text" id="auto-room"></div>
+                        <div class="grid-item"><label class="required-label">Projekt</label><input type="text" id="project-name" class="required-field"></div>
+                        <div class="grid-item"><label class="required-label">Gastgeber</label><input type="text" id="auto-host"></div>
                         <div class="grid-item"><label>Vertreter</label><input type="text" id="representative"></div>
-                        <div class="grid-item"><label>Anzahl Gäste</label><input type="number" id="guest-count" class="required-field"></div>
+                        <div class="grid-item"><label class="required-label">Anzahl Gäste</label><input type="number" id="guest-count" class="required-field"></div>
                         <div class="grid-item"><label>Sonstiges</label><input type="text" id="other-info"></div>
                     </div>
 
@@ -152,6 +163,17 @@
                         <div class="grid-item"><label>Allergien</label><input type="text" id="cant-allergies"></div>
                     </div>
             </div>
+
+            <div class="section-title">
+                Teilnehmer
+            </div>
+
+            <textarea
+                id="attendee-list"
+                rows="10"
+                readonly
+                class="readonly-field">
+            </textarea>
 
             <div class="ms-welcome__action ms-Button ms-Button--hero ms-Button--primary" id="run">
                 <span class="ms-Button-label">Angaben speichern</span>
