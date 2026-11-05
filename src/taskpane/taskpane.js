@@ -645,6 +645,55 @@ function loadAttendees() {
 
 function buildBookingText(data) {
 
+    if (
+        data.supportRequired === "no"
+        &&
+        data.cateringDecision === "no"
+    ) {
+
+        return `
+    <div id="roomcheck-block">
+
+    <table
+        width="100%"
+        cellpadding="0"
+        cellspacing="0"
+        style="
+            border-collapse:collapse;
+            font-family:'Segoe UI', Arial, sans-serif;
+            border:1px solid #d1d1d1;
+        ">
+
+        <tr>
+            <td
+                style="
+                    background:#0078D4;
+                    color:white;
+                    padding:15px;
+                    font-size:20px;
+                    font-weight:bold;
+                ">
+                Raumbuchung
+            </td>
+        </tr>
+
+        <tr>
+            <td
+                style="
+                    padding:15px;
+                    background:#f8f8f8;
+                ">
+                Kein Support und keine Bewirtung gewünscht.
+            </td>
+        </tr>
+
+    </table>
+
+    </div>
+    `;
+    }
+
+
     const guestStatus =
         data.guestStatus?.length > 0
             ? data.guestStatus.join(", ")
@@ -657,7 +706,7 @@ function buildBookingText(data) {
 
     return `
 
-<!-- ROOMCHECK_START -->
+<div id="roomcheck-block">
 
 <table
     width="100%"
@@ -895,7 +944,7 @@ function buildBookingText(data) {
 
 </table>
 
-<!-- ROOMCHECK_END -->
+</div>
 
 `;
 }
@@ -917,10 +966,25 @@ function updateAppointmentBody(data) {
 
             let body = result.value;
 
-            body = body.replace(
-                /<!-- ROOMCHECK_START -->[\s\S]*?<!-- ROOMCHECK_END -->/g,
-                ""
-            );
+            const parser =
+                new DOMParser();
+
+            const doc =
+                parser.parseFromString(
+                    body,
+                    "text/html"
+                );
+
+            const existing =
+                doc.getElementById(
+                    "roomcheck-block"
+                );
+
+            if (existing) {
+                existing.remove();
+            }
+
+            body = doc.body.innerHTML;
 
             body =
                 buildBookingText(data)
