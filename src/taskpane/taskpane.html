@@ -9,6 +9,7 @@
     <script type="text/javascript" src="taskpane.js"></script>
     <link rel="stylesheet" href="https://res-1.cdn.office.net/files/fabric-cdn-prod_20230815.002/office-ui-fabric-core/11.1.0/css/fabric.min.css"/>
     <link href="taskpane.css" rel="stylesheet" type="text/css" />
+    <style>@font-face {font-family:'GrotesqueDCA-R';src:url('https://mbenner26.github.io/room-check/assets/fonts/GrotesqueDCA-R.otf');}</style>
 </head>
 <body class="ms-font-m ms-welcome ms-Fabric">
     <header class="ms-welcome__header ms-bgColor-neutralLighter">
@@ -132,15 +133,6 @@
                         <div class="grid-item"><label>Sonstiges</label><input type="text" id="other-info"></div>
                     </div>
 
-                    <!-- Externe Gäste Status -->
-                    <div class="section-title">Externe Gäste</div>
-                    <div class="checkbox-group-row">
-                        <label><input type="checkbox" name="guestStatus" value="Gold"> Gold</label>
-                        <label><input type="checkbox" name="guestStatus" value="Silber"> Silber</label>
-                        <label><input type="checkbox" name="guestStatus" value="Bronze"> Bronze</label>
-                        <label><input type="checkbox" name="guestStatus" value="VIP"> VIP</label>
-                    </div>
-
                     <!-- Bewirtung -->
                     <div class="section-title">Bewirtung</div>
                     <div class="checkbox-group-row">
@@ -165,15 +157,48 @@
             </div>
 
             <div class="section-title">
-                Teilnehmer
+                Externe Gäste
             </div>
 
-            <textarea
-                id="attendee-list"
-                rows="10"
-                readonly
-                class="readonly-field">
-            </textarea>
+            <table
+                id="guestTable"
+                class="guest-table">
+
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Firma</th>
+                        <th>Rolle</th>
+                    </tr>
+                </thead>
+
+                <tbody id="guestTableBody">
+
+                    <tr>
+                        <td>
+                            <input type="text">
+                        </td>
+
+                        <td>
+                            <input type="text">
+                        </td>
+
+                        <td>
+                            <input type="text">
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+            <button
+                type="button"
+                id="addGuest">
+
+                + Gast hinzufügen
+
+            </button>
 
             <div class="ms-welcome__action ms-Button ms-Button--hero ms-Button--primary" id="run">
                 <span class="ms-Button-label">Angaben speichern</span>
