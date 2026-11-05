@@ -53,31 +53,6 @@ async function ensureItemIsSaved() {
   return Promise.resolve();
 }
 
-document
-    .getElementById("addGuest")
-    .addEventListener(
-        "click",
-        addGuestRow
-    );
-
-function addGuestRow() {
-
-    const row =
-        document.createElement("tr");
-
-    row.innerHTML = `
-        <td><input type="text"></td>
-        <td><input type="text"></td>
-        <td><input type="text"></td>
-    `;
-
-    document
-        .getElementById(
-            "guestTableBody"
-        )
-        .appendChild(row);
-}
-
 async function loadAppointmentData() {
     const item = Office.context.mailbox.item;
     if (!item) {
@@ -168,13 +143,7 @@ async function loadSavedProperties() {
           document.getElementById("representative").value = data.representative || "";
           document.getElementById("guest-count").value = data.guestCount || "";
           document.getElementById("other-info").value = data.other || "";
-          document.getElementById("attendee-list").value = data.attendees || "";
 
-          if (data.guestStatus) {
-            document.querySelectorAll('input[name="guestStatus"]').forEach(cb => {
-              cb.checked = data.guestStatus.includes(cb.value);
-            });
-          }
           if (data.catering) {
             document.querySelectorAll('input[name="cateringType"]').forEach(cb => {
               cb.checked = data.catering.includes(cb.value);
@@ -417,9 +386,6 @@ async function saveRequirements() {
 
         other:
             document.getElementById("other-info").value,
-
-        guestStatus:
-            getCheckedValues("guestStatus"),
 
         catering:
             getCheckedValues("cateringType"),
@@ -733,18 +699,35 @@ function loadAttendees() {
                     .map(
                         a => a.displayName
                     );
-
-            document
-                .getElementById(
-                    "attendee-list"
-                )
-                .value =
-                    attendees.join("\n");
         }
     );
 }
 
 function buildBookingText(data) {
+
+  const guestRows =
+
+      (
+          data.guests || []
+      )
+
+      .map(
+          guest => `
+
+  <tr>
+
+  <td>${guest.name || "-"}</td>
+
+  <td>${guest.company || "-"}</td>
+
+  <td>${guest.role || "-"}</td>
+
+  </tr>
+
+  `
+      )
+
+      .join("");
 
     if (
         data.supportRequired === "no"
@@ -955,35 +938,33 @@ function buildBookingText(data) {
     </tr>
 
     <tr>
-        <td colspan="2" style="padding:10px;">
 
-        <tr>
+        <td colspan="2">
 
-            <td colspan="2">
+            <table
+                width="100%"
+                border="1"
+                cellspacing="0"
+                cellpadding="5"
+                style="border-collapse:collapse;">
 
-                <table
-                    width="100%"
-                    border="1"
-                    cellspacing="0"
-                    cellpadding="5"
-                    style="
-                        border-collapse:
-                        collapse;
-                    ">
+                <tr>
 
-                    <tr>
+                    <th>Name</th>
 
-                        <th>Name</th>
+                    <th>Firma</th>
 
-                        <th>Firma</th>
+                    <th>Rolle</th>
 
-                        <th>Rolle</th>
+                </tr>
 
-                    </tr>
+                ${guestRows}
 
-                    ${guestRows}
+            </table>
 
-                </table>
+        </td>
+
+    </tr>
 
             </td>
 
