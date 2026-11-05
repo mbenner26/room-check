@@ -132,6 +132,23 @@ async function loadSavedProperties() {
   });
 }
 
+function showError(text) {
+
+    Office.context.mailbox.item
+        .notificationMessages
+        .replaceAsync(
+            "validation",
+            {
+                type:
+                    Office.MailboxEnums
+                        .ItemNotificationMessageType
+                        .ErrorMessage,
+
+                message: text
+            }
+        );
+}
+
 async function saveRequirements() {
 
     console.log("Speichern gestartet");
@@ -217,41 +234,102 @@ async function saveRequirements() {
         }
     };
 
-    const missingFields = [];
+    const supportDecision =
+        document.querySelector(
+            'input[name="supportRequired"]:checked'
+        );
 
-    if (!formData.presentation)
-        missingFields.push("Präsentation");
+    const cateringDecision =
+        document.querySelector(
+            'input[name="cateringDecision"]:checked'
+        );
 
-    if (!formData.externalGuests)
-        missingFields.push("Externe Gäste");
+    if (!supportDecision) {
 
-    if (!formData.meetingType)
-        missingFields.push("Videokonferenz");
-
-    if (!formData.project)
-        missingFields.push("Projekt");
-
-    if (!formData.guestCount)
-        missingFields.push("Anzahl Gäste");
-
-    if (missingFields.length > 0) {
-
-        Office.context.mailbox.item.notificationMessages.replaceAsync(
-            "validation",
-            {
-                type:
-                    Office.MailboxEnums
-                        .ItemNotificationMessageType
-                        .ErrorMessage,
-
-                message:
-                    "Pflichtfelder fehlen: "
-                    + missingFields.join(", ")
-            }
+        showError(
+            "Bitte auswählen, ob Support benötigt wird."
         );
 
         return;
     }
+
+    if (!cateringDecision) {
+
+        showError(
+            "Bitte auswählen, ob Bewirtung benötigt wird."
+        );
+
+        return;
+    }
+
+    const missingFields = [];
+
+    if (supportDecision.value === "yes") {
+
+        if (!formData.presentation)
+            missingFields.push(
+                "Präsentation"
+            );
+
+        if (!formData.externalGuests)
+            missingFields.push(
+                "Externe Gäste"
+            );
+
+        if (!formData.meetingType)
+            missingFields.push(
+                "Videokonferenz"
+            );
+    }
+
+    if (cateringDecision.value === "yes") {
+
+        if (!formData.date)
+            missingFields.push("Datum");
+
+        if (!formData.time)
+            missingFields.push("Zeit");
+
+        if (!formData.room)
+            missingFields.push("Raum");
+
+        if (!formData.host)
+            missingFields.push(
+                "Gastgeber"
+            );
+
+        if (!formData.project)
+            missingFields.push(
+                "Projekt"
+            );
+
+        if (!formData.guestCount)
+            missingFields.push(
+                "Anzahl Gäste"
+            );
+    }
+
+    if (missingFields.length > 0) {
+
+        Office.context.mailbox.item
+            .notificationMessages
+            .replaceAsync(
+                "validation",
+                {
+                    type:
+                        Office.MailboxEnums
+                            .ItemNotificationMessageType
+                            .ErrorMessage,
+
+                    message:
+                        "Fehlende Angaben: "
+                        + missingFields.join(", ")
+                }
+            );
+
+        return;
+    }
+
 
     console.log(formData);
 
@@ -319,27 +397,100 @@ async function saveRequirements() {
 }
 
 function setupConditionalLogic() {
-  const externalGuestsSelect = document.getElementById("externalGuests");
-  const guestDeviceContainer = document.getElementById("guestDeviceContainer");
-  if (externalGuestsSelect && guestDeviceContainer) {
-    externalGuestsSelect.addEventListener("change", () => {
-      guestDeviceContainer.style.display = (externalGuestsSelect.value === "yes" || externalGuestsSelect.value === "Ja") ? "block" : "none";
-    });
-  }
-  const canteenReq = document.getElementById("canteenRequested");
-  const canteenDetails = document.getElementById("canteenDetailsContainer");
-  if (canteenReq && canteenDetails) {
-    canteenReq.addEventListener("change", () => {
-      canteenDetails.style.display = canteenReq.checked ? "grid" : "none";
-    });
-  }
-  const cateringRequested = document.getElementById("cateringRequested");
-  const cateringDetailsContainer = document.getElementById("cateringDetailsContainer");
-  if (cateringRequested && cateringDetailsContainer) {
-    cateringRequested.addEventListener("change", () => {
-      cateringDetailsContainer.style.display = cateringRequested.checked ? "block" : "none";
-    });
-  }
+    document
+        .querySelectorAll(
+            'input[name="supportRequired"]'
+        )
+        .forEach(radio => {
+            radio.addEventListener(
+                "change",
+                () => {
+                    document
+                        .getElementById(
+                            "supportContainer"
+                        )
+                        .style.display =
+                            (
+                                radio.value === "yes"
+                                &&
+                                radio.checked
+                            )
+                                ? "block"
+                                : "none";
+                }
+            );
+        });
+
+    document
+        .querySelectorAll(
+            'input[name="cateringDecision"]'
+        )
+        .forEach(radio => {
+            radio.addEventListener(
+                "change",
+                () => {
+                    document
+                        .getElementById(
+                            "cateringDetailsContainer"
+                        )
+                        .style.display =
+                            (
+                                radio.value === "yes"
+                                &&
+                                radio.checked
+                            )
+                                ? "block"
+                                : "none";
+                }
+            );
+        });
+
+    const canteenReq =
+        document.getElementById(
+            "canteenRequested"
+        );
+    const canteenDetails =
+        document.getElementById(
+            "canteenDetailsContainer"
+        );
+    if (
+        canteenReq &&
+        canteenDetails
+    ) {
+        canteenReq.addEventListener(
+            "change",
+            () => {
+                canteenDetails.style.display =
+                    canteenReq.checked
+                        ? "grid"
+                        : "none";
+            }
+        );
+    }
+
+    const externalGuestsSelect =
+        document.getElementById(
+            "externalGuests"
+        );
+    const guestDeviceContainer =
+        document.getElementById(
+            "guestDeviceContainer"
+        );
+    if (
+        externalGuestsSelect &&
+        guestDeviceContainer
+    ) {
+        externalGuestsSelect.addEventListener(
+            "change",
+            () => {
+                guestDeviceContainer.style.display =
+                    externalGuestsSelect.value
+                        === "yes"
+                    ? "block"
+                    : "none";
+            }
+        );
+    }
 }
 
 function buildBookingText(data) {
