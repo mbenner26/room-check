@@ -18,57 +18,94 @@
     <main id="app-body" class="ms-welcome__main">
         <form id="requirementsForm">
             <!-- Präsentation -->
-            <div class="form-group">
-                <label for="presentation" class="required-label">Präsentation</label>
-                <select id="presentation" required class="required-field">
-                    <option value="">Bitte auswählen...</option>
-                    <option value="analog">Analog</option>
-                    <option value="digital">Digital</option>
-                    <option value="none">keine</option>
-                </select>
+            <div class="card-section">
+                <label class="required-label">
+                    Support benötigt?
+                </label>
+                <div class="radio-group">
+                    <label>
+                        <input
+                            type="radio"
+                            name="supportRequired"
+                            value="yes">
+                        Ja
+                    </label>
+                    <label>
+                        <input
+                            type="radio"
+                            name="supportRequired"
+                            value="no">
+                        Nein
+                    </label>
+                </div>
             </div>
+            <div id="supportContainer" style="display:none;">
+                <div class="form-group">
+                    <label for="presentation" class="required-label">Präsentation</label>
+                    <select id="presentation" required class="required-field">
+                        <option value="">Bitte auswählen...</option>
+                        <option value="analog">Analog</option>
+                        <option value="digital">Digital</option>
+                        <option value="none">keine</option>
+                    </select>
+                </div>
 
-            <!-- Externe Gäste -->
-            <div class="form-group">
-                <label for="externalGuests" class="required-label">Externe Gäste?</label>
-                <select id="externalGuests" required class="required-field">
-                    <option value="">Bitte auswählen...</option>
-                    <option value="yes">Ja</option>
-                    <option value="no">Nein</option>
-                </select>
-            </div>
+                <!-- Externe Gäste -->
+                <div class="form-group">
+                    <label for="externalGuests" class="required-label">Externe Gäste?</label>
+                    <select id="externalGuests" required class="required-field">
+                        <option value="">Bitte auswählen...</option>
+                        <option value="yes">Ja</option>
+                        <option value="no">Nein</option>
+                    </select>
+                </div>
 
-            <!-- Bedingtes Feld: Gerät (Standardmäßig ausgeblendet) -->
-            <div id="guestDeviceContainer" class="form-group" style="display: none;">
-                <label for="guestDevice">Gerät der externen Gäste</label>
-                <select id="guestDevice">
-                    <option value="windows">Windows-Laptop</option>
-                    <option value="mac">Mac</option>
-                    <option value="mobile">Smartphone/Tablet</option>
-                    <option value="unknown">Unbekannt</option>
-                </select>
-            </div>
+                <!-- Bedingtes Feld: Gerät (Standardmäßig ausgeblendet) -->
+                <div id="guestDeviceContainer" class="form-group" style="display: none;">
+                    <label for="guestDevice">Gerät der externen Gäste</label>
+                    <select id="guestDevice">
+                        <option value="windows">Windows-Laptop</option>
+                        <option value="mac">Mac</option>
+                        <option value="mobile">Smartphone/Tablet</option>
+                        <option value="unknown">Unbekannt</option>
+                    </select>
+                </div>
 
-            <!-- Videokonferenz -->
-            <div class="form-group">
-                <label for="meetingType" class="required-label">Videokonferenz</label>
-                <select id="meetingType" required class="required-field">
-                    <option value="">Bitte auswählen...</option>
-                    <option value="teams">Microsoft Teams</option>
-                    <option value="other">Andere Plattform</option>
-                    <option value="none">Keine</option>
-                </select>
-            </div>
-
-            <!-- Bewirtung -->
-            <div class="form-group">
-                <label>Bewirtung gewünscht?</label>
-                <div class="checkbox-inline">
-                    <input type="checkbox" id="cateringRequested"> 
-                    <span class="checkbox-label">Ja, Bewirtung bestellen</span>
+                <!-- Videokonferenz -->
+                <div class="form-group">
+                    <label for="meetingType" class="required-label">Videokonferenz</label>
+                    <select id="meetingType" required class="required-field">
+                        <option value="">Bitte auswählen...</option>
+                        <option value="teams">Microsoft Teams</option>
+                        <option value="other">Andere Plattform</option>
+                        <option value="none">Keine</option>
+                    </select>
                 </div>
             </div>
             
+            <!-- Bewirtung -->
+            <div class="card-section">
+                <label class="required-label">
+                    Bewirtung benötigt?
+                </label>
+                <div class="radio-group">
+                    <label>
+                        <input
+                            type="radio"
+                            name="cateringDecision"
+                            value="yes">
+                        Ja
+                    </label>
+                    <label>
+                        <input
+                            type="radio"
+                            name="cateringDecision"
+                            value="no">
+                        Nein
+                    </label>
+                </div>
+            </div>
+
             <!-- Bedingtes Feld: Bewirtungs-Details (Standardmäßig ausgeblendet) -->
             <div id="cateringDetailsContainer" class="form-group" style="display: none; border-left: 3px solid #0078d7; padding-left: 15px; margin-left: 5px;">
                     <!-- Meeting Details (Automatisch) -->
@@ -83,7 +120,7 @@
                         <div class="grid-item"><label>Anzahl Gäste</label><input type="number" id="guest-count" class="required-field"></div>
                         <div class="grid-item"><label>Sonstiges</label><input type="text" id="other-info"></div>
                     </div>
-            
+
                     <!-- Externe Gäste Status -->
                     <div class="section-title">Externe Gäste</div>
                     <div class="checkbox-group-row">
@@ -92,7 +129,7 @@
                         <label><input type="checkbox" name="guestStatus" value="Bronze"> Bronze</label>
                         <label><input type="checkbox" name="guestStatus" value="VIP"> VIP</label>
                     </div>
-            
+
                     <!-- Bewirtung -->
                     <div class="section-title">Bewirtung</div>
                     <div class="checkbox-group-row">
@@ -100,14 +137,14 @@
                         <label><input type="checkbox" id="cat-süß" name="cateringType" value="süß"> Süß</label>
                         <label><input type="checkbox" id="cat-herzhaft" name="cateringType" value="herzhaft"> Herzhaft</label>
                     </div>
-            
+
                     <!-- Tischreservierung Kantine -->
                     <div class="section-title">Tischreservierung Kantine</div>
                     <div class="checkbox-inline">
-                        <input type="checkbox" id="canteenRequested"> 
+                        <input type="checkbox" id="canteenRequested">
                         <label for="canteenRequested">Einladungskärtchen Kantine (mit Namensnennung)</label>
                     </div>
-                    
+
                     <div id="canteenDetailsContainer" class="data-grid" style="display: none;">
                         <div class="grid-item"><label>Datum</label><input type="date" id="cant-date"></div>
                         <div class="grid-item"><label>Zeit</label><input type="time" id="cant-time"></div>
