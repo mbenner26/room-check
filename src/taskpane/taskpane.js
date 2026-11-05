@@ -13,6 +13,20 @@ Office.onReady((info) => {
         loadAttendees();
         addServiceAttendees();
         setupConditionalLogic();
+
+        const addGuestBtn =
+            document.getElementById(
+                "addGuest"
+            );
+
+        if (addGuestBtn) {
+
+            addGuestBtn.addEventListener(
+                "click",
+                addGuestRow
+            );
+
+        }
 });
 
 
@@ -37,6 +51,31 @@ async function ensureItemIsSaved() {
     });
   }
   return Promise.resolve();
+}
+
+document
+    .getElementById("addGuest")
+    .addEventListener(
+        "click",
+        addGuestRow
+    );
+
+function addGuestRow() {
+
+    const row =
+        document.createElement("tr");
+
+    row.innerHTML = `
+        <td><input type="text"></td>
+        <td><input type="text"></td>
+        <td><input type="text"></td>
+    `;
+
+    document
+        .getElementById(
+            "guestTableBody"
+        )
+        .appendChild(row);
 }
 
 async function loadAppointmentData() {
@@ -167,6 +206,37 @@ async function loadSavedProperties() {
   });
 }
 
+function addGuestRow() {
+
+    const row =
+        document.createElement(
+            "tr"
+        );
+
+    row.innerHTML = `
+
+        <td>
+            <input type="text">
+        </td>
+
+        <td>
+            <input type="text">
+        </td>
+
+        <td>
+            <input type="text">
+        </td>
+
+    `;
+
+    document
+        .getElementById(
+            "guestTableBody"
+        )
+        .appendChild(row);
+}
+
+
 function addServiceAttendees() {
 
     const item = Office.context.mailbox.item;
@@ -269,6 +339,34 @@ async function saveRequirements() {
             )
         ).map(cb => cb.value);
 
+        const guests = [];
+
+        document
+            .querySelectorAll(
+                "#guestTableBody tr"
+            )
+            .forEach(row => {
+
+                const inputs =
+                    row.querySelectorAll(
+                        "input"
+                    );
+
+                guests.push({
+
+                    name: inputs[0].value,
+
+                    company:
+                        inputs[1].value,
+
+                    role:
+                        inputs[2].value
+
+                });
+
+            });
+
+
     const formData = {
 
         supportRequired:
@@ -326,8 +424,7 @@ async function saveRequirements() {
         catering:
             getCheckedValues("cateringType"),
 
-        attendees:
-            document.getElementById("attendee-list").value,
+        guests: guests,
 
         canteen: {
             requested:
@@ -461,6 +558,10 @@ async function saveRequirements() {
         }
 
         const props = loadResult.value;
+
+        console.log(
+            formData.canteen
+        );
 
         props.set(
             "savedRequirements",
@@ -651,6 +752,36 @@ function buildBookingText(data) {
         data.cateringDecision === "no"
     ) {
 
+      const guestRows =
+
+          (
+              data.guests || []
+          )
+
+          .map(
+              guest => `
+
+      <tr>
+
+          <td>
+              ${guest.name || "-"}
+          </td>
+
+          <td>
+              ${guest.company || "-"}
+          </td>
+
+          <td>
+              ${guest.role || "-"}
+          </td>
+
+      </tr>
+
+      `
+          )
+
+          .join("");
+
         return `
     <div id="roomcheck-block">
 
@@ -826,8 +957,37 @@ function buildBookingText(data) {
     <tr>
         <td colspan="2" style="padding:10px;">
 
-            ${(data.attendees || "-")
-                .replace(/\n/g,"<br>")}
+        <tr>
+
+            <td colspan="2">
+
+                <table
+                    width="100%"
+                    border="1"
+                    cellspacing="0"
+                    cellpadding="5"
+                    style="
+                        border-collapse:
+                        collapse;
+                    ">
+
+                    <tr>
+
+                        <th>Name</th>
+
+                        <th>Firma</th>
+
+                        <th>Rolle</th>
+
+                    </tr>
+
+                    ${guestRows}
+
+                </table>
+
+            </td>
+
+            </tr>
 
         </td>
     </tr>
