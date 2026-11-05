@@ -898,6 +898,12 @@ function updateAppointmentBody(data) {
                 result.status !==
                 Office.AsyncResultStatus.Succeeded
             ) {
+
+                console.error(
+                    "getAsync fehlgeschlagen:",
+                    result.error
+                );
+
                 return;
             }
 
@@ -913,11 +919,35 @@ function updateAppointmentBody(data) {
                 + "<br><br>"
                 + body;
 
+            console.log(
+                "BODY VOR DEM SCHREIBEN:",
+                body
+            );
+
             item.body.setAsync(
                 body,
                 {
                     coercionType:
                         Office.CoercionType.Html
+                },
+                (setResult) => {
+
+                    console.log(
+                        "SET BODY RESULT:",
+                        setResult
+                    );
+
+                    if (
+                        setResult.status !==
+                        Office.AsyncResultStatus.Succeeded
+                    ) {
+
+                        console.error(
+                            "Body konnte nicht geschrieben werden:",
+                            setResult.error
+                        );
+
+                    }
                 }
             );
         }
